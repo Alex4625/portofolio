@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('title');
             $table->text('description');
             $table->string('image_path');
-            $table->json('tech_stack');
+            $table->jsonb('tech_stack');
             $table->string('demo_url')->nullable();
             $table->string('github_url')->nullable();
             $table->boolean('is_featured')->default(true);

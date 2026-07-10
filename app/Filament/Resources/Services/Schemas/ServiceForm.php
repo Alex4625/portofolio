@@ -18,7 +18,7 @@ class ServiceForm
                     ->schema([
                         TextInput::make('title')->label('Nama Layanan')->required(),
                         TextInput::make('order_column')->label('Urutan')->numeric()->default(0),
-                        FileUpload::make('icon')->label('Ikon (Image)')->image()->directory('services')->columnSpanFull(),
+                        FileUpload::make('icon')->disk('s3')->label('Ikon (Image)')->image()->directory('services')->columnSpanFull(),
                         Textarea::make('description')->label('Deskripsi Layanan')->columnSpanFull(),
                     ])->columns(2),
             ]);

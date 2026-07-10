@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('galleries', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('image_path');
             $table->string('caption')->nullable();
             $table->integer('order_column')->default(0);

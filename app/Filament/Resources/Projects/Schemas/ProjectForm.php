@@ -26,7 +26,7 @@ class ProjectForm
                             ->label('Deskripsi')
                             ->required()
                             ->columnSpanFull(),
-                        FileUpload::make('image_path')
+                        FileUpload::make('image_path')->disk('s3')
                             ->label('Thumbnail Proyek')
                             ->image()
                             ->directory('projects')

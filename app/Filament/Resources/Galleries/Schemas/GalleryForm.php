@@ -15,7 +15,7 @@ class GalleryForm
             ->components([
                 Section::make('Foto Galeri')
                     ->schema([
-                        FileUpload::make('image_path')->label('Foto Dokumentasi')->image()->directory('galleries')->required()->columnSpanFull(),
+                        FileUpload::make('image_path')->disk('s3')->label('Foto Dokumentasi')->image()->directory('galleries')->required()->columnSpanFull(),
                         TextInput::make('caption')->label('Keterangan / Caption')->columnSpanFull(),
                         TextInput::make('order_column')->label('Urutan')->numeric()->default(0),
                     ])->columns(2),

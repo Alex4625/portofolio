@@ -114,7 +114,7 @@
 
             <div>
                 @if($profile && $profile->cv_pdf_path)
-                <a href="{{ asset('storage/' . $profile->cv_pdf_path) }}" target="_blank" class="font-mono-tech text-xs px-4 py-2 border border-[var(--line-blue)] text-[var(--line-blue)] hover:bg-[var(--line-blue)] hover:text-[#0A1128] transition-all">
+                <a href="{{ Storage::disk('s3')->url($profile->cv_pdf_path) }}" target="_blank" class="font-mono-tech text-xs px-4 py-2 border border-[var(--line-blue)] text-[var(--line-blue)] hover:bg-[var(--line-blue)] hover:text-[#0A1128] transition-all">
                     [ DOWNLOAD_CV ]
                 </a>
                 @endif
@@ -175,7 +175,7 @@
                     </div>
                     
                     @if($profile && $profile->hero_image)
-                        <img src="{{ asset('storage/' . $profile->hero_image) }}" alt="Hero Image" class="relative z-0 max-h-[500px] object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+                        <img src="{{ Storage::disk('s3')->url($profile->hero_image) }}" alt="Hero Image" class="relative z-0 max-h-[500px] object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
                     @else
                         <div class="w-64 h-80 border border-dashed border-[var(--line-blue)] text-[var(--line-blue)] flex items-center justify-center font-mono-tech text-xs opacity-50 z-0">
                             [ NO_IMAGE_DETECTED ]
@@ -283,7 +283,7 @@
                                     @foreach($skillGroup as $skill)
                                         <div class="glass-card px-4 py-3 font-mono-tech text-sm text-[var(--line-blue)] flex items-center space-x-2 border-[rgba(191,215,255,0.2)]">
                                             @if($skill->icon_image)
-                                                <img src="{{ asset('storage/' . $skill->icon_image) }}" alt="Icon" class="w-4 h-4 object-contain filter grayscale">
+                                                <img src="{{ Storage::disk('s3')->url($skill->icon_image) }}" alt="Icon" class="w-4 h-4 object-contain filter grayscale">
                                             @endif
                                             <span>{{ $skill->name }}</span>
                                         </div>
@@ -359,7 +359,7 @@
                     @foreach($projects as $project)
                     <div class="glass-card group border border-[rgba(191,215,255,0.2)] hover:border-[var(--glow-blue)] transition-colors flex flex-col">
                         <div class="relative aspect-video border-b border-[rgba(191,215,255,0.1)] overflow-hidden">
-                            <img src="{{ asset('storage/' . $project->image_path) }}" alt="{{ $project->title }}" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" loading="lazy">
+                            <img src="{{ Storage::disk('s3')->url($project->image_path) }}" alt="{{ $project->title }}" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" loading="lazy">
                             <!-- Overlay UI lines -->
                             <div class="absolute inset-0 border-[4px] border-transparent group-hover:border-[rgba(59,130,246,0.3)] transition-all pointer-events-none"></div>
                         </div>
@@ -411,7 +411,7 @@
                     @foreach($videos as $video)
                     <div class="aspect-[9/16] relative border border-[rgba(191,215,255,0.2)] group overflow-hidden">
                         @if($video->thumbnail_image)
-                            <img src="{{ asset('storage/' . $video->thumbnail_image) }}" alt="{{ $video->title }}" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500">
+                            <img src="{{ Storage::disk('s3')->url($video->thumbnail_image) }}" alt="{{ $video->title }}" class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500">
                         @else
                             <div class="w-full h-full bg-[rgba(255,255,255,0.02)] flex items-center justify-center font-mono-tech text-[10px] text-gray-600">NO_SIGNAL</div>
                         @endif
@@ -449,7 +449,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     @foreach($galleries as $photo)
                     <div class="aspect-square relative border border-[rgba(191,215,255,0.1)] overflow-hidden group">
-                        <img src="{{ asset('storage/' . $photo->image_path) }}" alt="{{ $photo->caption }}" class="w-full h-full object-cover filter sepia-[.3] group-hover:sepia-0 transition-all duration-500">
+                        <img src="{{ Storage::disk('s3')->url($photo->image_path) }}" alt="{{ $photo->caption }}" class="w-full h-full object-cover filter sepia-[.3] group-hover:sepia-0 transition-all duration-500">
                         @if($photo->caption)
                         <div class="absolute inset-0 bg-[rgba(10,17,40,0.8)] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4 text-center">
                             <p class="font-mono-tech text-xs text-white">{{ $photo->caption }}</p>

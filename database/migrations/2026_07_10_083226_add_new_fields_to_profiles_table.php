@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('signature_image')->nullable();
             $table->string('years_of_experience')->nullable();
             $table->string('projects_completed')->nullable();
-            $table->json('stats_json')->nullable();
+            $table->jsonb('stats_json')->nullable();
         });
     }
 

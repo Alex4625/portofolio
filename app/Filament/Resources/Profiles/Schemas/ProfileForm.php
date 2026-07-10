@@ -24,9 +24,9 @@ class ProfileForm
                     ])->columns(2),
                 Section::make('Media & Gambar')
                     ->schema([
-                        FileUpload::make('hero_image')->label('Foto Utama (Hero)')->image()->directory('profiles'),
-                        FileUpload::make('about_image')->label('Foto About Me')->image()->directory('profiles'),
-                        FileUpload::make('signature_image')->label('Tanda Tangan')->image()->directory('profiles'),
+                        FileUpload::make('hero_image')->disk('s3')->label('Foto Utama (Hero)')->image()->directory('profiles'),
+                        FileUpload::make('about_image')->disk('s3')->label('Foto About Me')->image()->directory('profiles'),
+                        FileUpload::make('signature_image')->disk('s3')->label('Tanda Tangan')->image()->directory('profiles'),
                     ])->columns(3),
                 Section::make('Statistik & Angka')
                     ->schema([
@@ -36,7 +36,7 @@ class ProfileForm
                     ])->columns(2),
                 Section::make('Media Sosial & CV')
                     ->schema([
-                        FileUpload::make('cv_pdf_path')->label('File CV (PDF)')->acceptedFileTypes(['application/pdf'])->directory('cv'),
+                        FileUpload::make('cv_pdf_path')->disk('s3')->label('File CV (PDF)')->acceptedFileTypes(['application/pdf'])->directory('cv'),
                         TextInput::make('github_url')->url(),
                         TextInput::make('instagram_url')->url(),
                         TextInput::make('youtube_url')->url(),

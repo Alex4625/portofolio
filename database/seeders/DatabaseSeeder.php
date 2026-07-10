@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Clear old data to prevent duplication
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         User::truncate();
         Profile::truncate();
         Skill::truncate();
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         Video::truncate();
         Gallery::truncate();
         Project::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
 
         // 1. User
         User::create([

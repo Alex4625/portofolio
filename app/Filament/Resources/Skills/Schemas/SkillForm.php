@@ -35,7 +35,7 @@ class SkillForm
                             ->minValue(0)
                             ->maxValue(100)
                             ->suffix('%'),
-                        FileUpload::make('icon_image')
+                        FileUpload::make('icon_image')->disk('s3')
                             ->label('Logo/Ikon Tool (Opsional)')
                             ->image()
                             ->directory('skills'),

@@ -18,7 +18,7 @@ class VideoForm
                         TextInput::make('title')->label('Judul Konten')->required(),
                         TextInput::make('order_column')->label('Urutan')->numeric()->default(0),
                         TextInput::make('embed_url')->label('Embed URL (TikTok/YouTube)')->url()->columnSpanFull(),
-                        FileUpload::make('thumbnail_image')->label('Gambar Thumbnail (Opsional)')->image()->directory('videos')->columnSpanFull(),
+                        FileUpload::make('thumbnail_image')->disk('s3')->label('Gambar Thumbnail (Opsional)')->image()->directory('videos')->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
