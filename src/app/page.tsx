@@ -5,6 +5,8 @@ import { FaGithub, FaLinkedin } from 'react-icons/fa';
 
 const R2_URL = "https://pub-bb3ad634e09444a1b3bcbe6d9cdef19e.r2.dev";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const profile = await getProfile();
   const projects = await getProjects();

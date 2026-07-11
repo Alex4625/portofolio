@@ -3,6 +3,8 @@ import { updateProfileAction } from "./actions";
 
 const R2_URL = "https://pub-bb3ad634e09444a1b3bcbe6d9cdef19e.r2.dev";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminProfile() {
   const profile = await getProfile();
 
