@@ -1,5 +1,6 @@
 import { getSiteData, text } from "@/../lib/data";
 import { toPublicUrl } from "@/../lib/r2";
+import { requireAdmin } from "@/../lib/auth";
 import { updateProfileAction } from "./actions";
 
 function fileHint(path?: string) {
@@ -8,6 +9,7 @@ function fileHint(path?: string) {
 }
 
 export default async function AdminDashboard() {
+  await requireAdmin();
   const data = await getSiteData();
   const profile = data.profile;
   const statsJson = JSON.stringify(profile?.stats_json || [], null, 2);

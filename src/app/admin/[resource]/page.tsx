@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { supabase } from "@/../lib/db";
 import { text, type DbRow } from "@/../lib/data";
 import { toPublicUrl } from "@/../lib/r2";
+import { requireAdmin } from "@/../lib/auth";
 import { resourceConfigs, type FieldKind } from "@/../lib/adminResources";
 import { deleteResourceAction, upsertResourceAction } from "../actions";
 
@@ -91,6 +92,7 @@ function ResourceForm({ resource, row }: { resource: string; row?: DbRow }) {
 }
 
 export default async function ResourcePage({ params }: PageProps) {
+  await requireAdmin();
   const { resource } = await params;
   const config = resourceConfigs[resource];
   if (!config) notFound();
