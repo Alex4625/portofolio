@@ -59,7 +59,6 @@ export async function updateProfileAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin");
-  return { success: true };
 }
 
 // PROJECT ACTIONS
@@ -84,7 +83,6 @@ export async function createProjectAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin/projects");
-  return { success: true };
 }
 
 export async function deleteProjectAction(id: string, imagePath?: string) {
