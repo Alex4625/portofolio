@@ -14,7 +14,7 @@ export async function logoutAction() {
 }
 
 // PROFILE ACTIONS
-export async function updateProfileAction(formData: FormData) {
+export async function updateProfileAction(formData: FormData): Promise<void> {
   const name = formData.get("name") as string;
   const profession = formData.get("profession") as string;
   const bio = formData.get("bio") as string;
