@@ -1,7 +1,7 @@
 "use server";
 
 import { login, logout } from "@/../lib/auth";
-import { sql } from "@/../lib/db";
+import { supabase } from "@/../lib/db";
 import { uploadToR2, deleteFromR2 } from "@/../lib/r2";
 import { revalidatePath } from "next/cache";
 
@@ -40,21 +40,18 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
     cvPath = await uploadToR2(cvFile, "profiles");
   }
 
-  const existingProfile = await sql`SELECT id FROM profiles LIMIT 1`;
+  const { data: existingProfile } = await supabase.from('profiles').select('id').limit(1).single();
 
-  if (existingProfile.length > 0) {
-    await sql`
-      UPDATE profiles 
-      SET name = ${name}, profession = ${profession}, bio = ${bio}, email = ${email}, 
-          github_url = ${github_url}, linkedin_url = ${linkedin_url}, 
-          avatar_path = ${avatarPath}, cv_pdf_path = ${cvPath}, updated_at = NOW()
-      WHERE id = ${existingProfile[0].id}
-    `;
+  if (existingProfile) {
+    await supabase.from('profiles').update({
+      name, profession, bio, email, github_url, linkedin_url,
+      avatar_path: avatarPath, cv_pdf_path: cvPath, updated_at: new Date().toISOString()
+    }).eq('id', existingProfile.id);
   } else {
-    await sql`
-      INSERT INTO profiles (name, profession, bio, email, github_url, linkedin_url, avatar_path, cv_pdf_path)
-      VALUES (${name}, ${profession}, ${bio}, ${email}, ${github_url}, ${linkedin_url}, ${avatarPath}, ${cvPath})
-    `;
+    await supabase.from('profiles').insert({
+      name, profession, bio, email, github_url, linkedin_url,
+      avatar_path: avatarPath, cv_pdf_path: cvPath
+    });
   }
 
   revalidatePath("/");
@@ -62,7 +59,7 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
 }
 
 // PROJECT ACTIONS
-export async function createProjectAction(formData: FormData) {
+export async function createProjectAction(formData: FormData): Promise<void> {
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const technologies = formData.get("technologies") as string;
@@ -76,20 +73,18 @@ export async function createProjectAction(formData: FormData) {
     imagePath = await uploadToR2(imageFile, "projects");
   }
 
-  await sql`
-    INSERT INTO projects (title, description, technologies, url, image_path, is_published)
-    VALUES (${title}, ${description}, ${technologies}, ${url}, ${imagePath}, ${is_published})
-  `;
+  await supabase.from('projects').insert({
+    title, description, technologies, url, image_path: imagePath, is_published
+  });
 
   revalidatePath("/");
   revalidatePath("/admin/projects");
 }
 
-export async function deleteProjectAction(id: string, imagePath?: string) {
+export async function deleteProjectAction(id: string, imagePath?: string): Promise<void> {
   if (imagePath) await deleteFromR2(imagePath);
-  await sql`DELETE FROM projects WHERE id = ${id}`;
+  await supabase.from('projects').delete().eq('id', id);
   
   revalidatePath("/");
   revalidatePath("/admin/projects");
-  return { success: true };
 }
