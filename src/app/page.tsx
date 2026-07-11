@@ -1,195 +1,335 @@
-import Image from 'next/image';
-import { getProfile, getProjects, getSkills, getExperiences } from '@/../lib/data';
-import { Mail, ExternalLink, Terminal } from 'lucide-react';
-import { FaGithub, FaLinkedin } from 'react-icons/fa';
-
-const R2_URL = "https://pub-bb3ad634e09444a1b3bcbe6d9cdef19e.r2.dev";
+import Image from "next/image";
+import Link from "next/link";
+import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp, FaArrowRight, FaDesktop, FaUsers, FaChartLine, FaCheckCircle, FaChevronRight } from "react-icons/fa";
+import { getProfile, getProjects, getSkills, getExperiences, getServices, getCertifications, getGallery } from "@/../lib/data";
+import Navbar from "@/components/Navbar";
+import ScrollObserver from "@/components/ScrollObserver";
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const profile = await getProfile();
+  const profile = await getProfile() || {
+    name: "Tino Lambut",
+    profession: "Full Stack Developer",
+    bio: "Saya adalah seorang Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif.",
+    email: "tino@example.com",
+    avatar_path: "https://files.ituaku.site/assets/sites/content/6e13472f1c4b43c3a7a9646e141db7bbe8fad1ebc90a00f962478faa050c218d.webp"
+  };
   const projects = await getProjects();
   const skills = await getSkills();
   const experiences = await getExperiences();
+  
+  // New tables for full redesign matching napa.ituaku.com (using fallbacks if empty to show the layout)
+  const services = await getServices();
+  const certifications = await getCertifications();
+  const gallery = await getGallery();
+
+  const dummyServices = [
+    { order_num: 1, title: "Web Development", description: "(Frontend, Backend, Fullstack, API)" },
+    { order_num: 2, title: "Cyber Security & Pentesting", description: "(Vulnerability Assessment, Web Security)" },
+    { order_num: 3, title: "Cloud Architecture", description: "(AWS, Cloudflare, Deployment, CI/CD)" },
+    { order_num: 4, title: "Database Management", description: "(PostgreSQL, Supabase, MySQL)" }
+  ];
+
+  const dummyCerts = [
+    { year: 2024, organization: "CompTIA", title: "CompTIA Security+ Certification" },
+    { year: 2023, organization: "AWS", title: "AWS Certified Developer – Associate" },
+    { year: 2022, organization: "Google", title: "Google IT Support Professional Certificate" }
+  ];
+
+  const displayServices = services.length > 0 ? services : dummyServices;
+  const displayCerts = certifications.length > 0 ? certifications : dummyCerts;
+  const avatarUrl = profile?.avatar_path?.startsWith('http') ? profile.avatar_path : (profile?.avatar_path ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/portofolio/${profile.avatar_path}` : "https://files.ituaku.site/assets/sites/content/6e13472f1c4b43c3a7a9646e141db7bbe8fad1ebc90a00f962478faa050c218d.webp");
 
   return (
-    <main className="min-h-screen bg-[var(--background)] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1a2333] via-[#0B0E14] to-[#0B0E14] relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] opacity-20 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent-blue/30 to-transparent blur-3xl rounded-full mix-blend-screen" />
-      </div>
+    <main>
+      <ScrollObserver />
+      <Navbar profile={profile} />
 
-      <div className="max-w-5xl mx-auto px-6 py-20 relative z-10 space-y-32">
-        
-        {/* HERO SECTION */}
-        <section className="flex flex-col md:flex-row items-center gap-12 pt-10">
-          <div className="flex-1 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent-blue/30 bg-accent-blue/10 text-accent-blue font-mono text-sm">
-              <Terminal size={16} />
-              <span>System.out.println("Hello, World!");</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-              {profile ? profile.name : "Tino Lambut"} <br />
-              <span className="text-gradient font-mono text-3xl md:text-5xl mt-2 block">
-                {profile ? profile.profession : "Cyber Security & Developer"}
-              </span>
-            </h1>
-            
-            <p className="text-gray-400 text-lg max-w-2xl leading-relaxed">
-              {profile ? profile.bio : "Membangun sistem yang aman, scalable, dan modern. Berpengalaman dalam menembus keamanan siber dan merajut arsitektur cloud."}
-            </p>
-            
-            <div className="flex gap-4 pt-4">
-              <a href="#contact" className="px-6 py-3 rounded-lg bg-accent-blue text-black font-semibold hover:bg-white transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)]">
-                Hubungi Saya
-              </a>
-              <a href={profile?.cv_pdf_path ? `${R2_URL}/${profile.cv_pdf_path}` : "#"} target="_blank" className="px-6 py-3 rounded-lg border border-gray-700 hover:border-accent-blue hover:text-accent-blue transition-all font-mono">
-                [Unduh_CV.pdf]
-              </a>
-            </div>
-            
-            <div className="flex gap-6 pt-6 text-gray-500">
-              <a href={profile?.github_url || "#"} target="_blank" className="hover:text-accent-blue transition-colors"><FaGithub size={24} /></a>
-              <a href={profile?.linkedin_url || "#"} target="_blank" className="hover:text-accent-blue transition-colors"><FaLinkedin size={24} /></a>
-            </div>
-          </div>
-          
-          {profile?.avatar_path && (
-            <div className="relative w-64 h-64 md:w-80 md:h-80 shrink-0">
-              <div className="absolute inset-0 rounded-full border-2 border-accent-blue/30 animate-[spin_10s_linear_infinite]" border-dashed="true" />
-              <div className="absolute inset-2 rounded-full border border-accent-purple/50 animate-[spin_15s_linear_infinite_reverse]" />
-              <div className="absolute inset-4 rounded-full overflow-hidden glass-panel p-2">
-                <Image 
-                  src={`${R2_URL}/${profile.avatar_path}`} 
-                  alt="Avatar" 
-                  fill 
-                  className="object-cover rounded-full"
-                />
+      {/* 1. HERO SECTION */}
+      <section id="home" className="hero">
+        <div className="hero-bg-text">{profile?.profession || 'Developer'}</div>
+        <div className="section-container">
+          <div className="hero-content">
+            <div className="hero-info">
+              <span className="hero-greeting fade-in">Hello saya</span>
+              <h1 className="hero-name fade-in fade-in-delay-1">{profile?.name}</h1>
+              <div className="hero-actions fade-in fade-in-delay-2">
+                <Link href="#about" className="btn-primary">
+                  Tentang Saya <FaArrowRight />
+                </Link>
+              </div>
+              <div className="hero-social fade-in fade-in-delay-3">
+                {profile?.github_url && <a href={profile.github_url} target="_blank"><FaGithub /></a>}
+                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank"><FaLinkedin /></a>}
+                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank"><FaInstagram /></a>}
               </div>
             </div>
-          )}
-        </section>
-
-        {/* SKILLS SECTION */}
-        <section className="space-y-10">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold font-mono">
-              <span className="text-accent-blue">01.</span> Keahlian_Teknis
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-accent-blue to-transparent" />
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {skills.map((skill) => (
-              <div key={skill.id} className="glass-panel p-4 flex flex-col items-center gap-3 hover:-translate-y-1 transition-transform group">
-                <div className="w-12 h-12 relative">
-                  {skill.icon_path ? (
-                    <Image src={`${R2_URL}/${skill.icon_path}`} alt={skill.name} fill className="object-contain group-hover:scale-110 transition-transform" />
-                  ) : (
-                    <Terminal className="w-full h-full text-gray-500" />
-                  )}
-                </div>
-                <span className="font-mono text-sm text-gray-300">{skill.name}</span>
+            <div className="hero-image-wrapper fade-in fade-in-delay-1">
+              <div className="hero-image-ring"></div>
+              <div className="hero-image-frame">
+                <Image src={avatarUrl} alt={profile?.name || "Profile"} width={400} height={500} unoptimized />
               </div>
-            ))}
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* EXPERIENCE SECTION */}
-        <section className="space-y-10">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold font-mono">
-              <span className="text-accent-blue">02.</span> Pengalaman_Kerja
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-accent-blue to-transparent" />
+      {/* 2. ABOUT SECTION */}
+      <section id="about" className="section bg-white/5">
+        <div className="section-container">
+          <div className="about-grid">
+            <div className="about-left">
+              <div className="stat-card fade-in">
+                <div className="stat-number">5+</div>
+                <div className="stat-label">Years of Experience</div>
+              </div>
+              <div className="stat-card fade-in fade-in-delay-1">
+                <div style={{fontSize: '2rem', color: 'var(--cream)', marginBottom: '8px'}}><FaDesktop /></div>
+                <div className="stat-label">Projects Completed</div>
+                <div className="stat-number" style={{fontSize: '2rem', marginTop: '10px'}}>{projects.length || 15}+</div>
+              </div>
+            </div>
+            <div className="about-right">
+              <div className="section-header" style={{marginBottom: '24px'}}>
+                <span className="section-subtitle fade-in">About Me</span>
+                <h2 className="section-title fade-in fade-in-delay-1">
+                  {profile?.profession} | <span>Tech Enthusiast</span>
+                </h2>
+              </div>
+              <p className="about-description fade-in fade-in-delay-2">
+                {profile?.bio}
+              </p>
+            </div>
           </div>
-          
-          <div className="space-y-6 tech-border pl-6 relative">
-            {experiences.map((exp) => (
-              <div key={exp.id} className="relative">
-                <div className="absolute -left-[31px] top-2 w-3 h-3 rounded-full bg-accent-blue shadow-[0_0_10px_#00F0FF]" />
-                <div className="glass-panel p-6 space-y-2">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-                    <h3 className="text-xl font-bold text-white">{exp.role}</h3>
-                    <span className="font-mono text-sm text-accent-blue bg-accent-blue/10 px-3 py-1 rounded-full">
-                      {new Date(exp.start_date).getFullYear()} - {exp.end_date ? new Date(exp.end_date).getFullYear() : 'Sekarang'}
-                    </span>
+        </div>
+      </section>
+
+      {/* 3. SERVICES SECTION */}
+      <section id="services" className="section">
+        <div className="section-container">
+          <div className="section-header text-center">
+            <span className="section-subtitle fade-in">Layanan Tersedia</span>
+            <h2 className="section-title fade-in fade-in-delay-1">
+              Saya terbuka untuk kolaborasi, freelance project, <br/>maupun kerjasama profesional
+            </h2>
+          </div>
+          <div className="services-grid">
+            <div className="services-list">
+              {displayServices.map((svc: any, idx: number) => (
+                <div key={idx} className={`service-item fade-in fade-in-delay-${idx % 4}`}>
+                  <div className="d-flex align-items-center">
+                    <span className="service-num">{svc.order_num}.</span>
+                    <span className="service-name">{svc.title}</span>
                   </div>
-                  <h4 className="text-accent-purple font-medium">{exp.company}</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">{exp.description}</p>
+                  {svc.description && <p className="service-desc">{svc.description}</p>}
                 </div>
+              ))}
+            </div>
+            <div className="services-image fade-in fade-in-delay-1">
+              <Image src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Services" width={600} height={500} unoptimized className="rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. SKILLS SECTION */}
+      <section id="skills" className="section bg-white/5">
+        <div className="section-container">
+          <div className="skills-grid">
+            <div className="skills-col">
+              <h3 className="skill-group-title fade-in">Keahlian Utama</h3>
+              {skills.slice(0, Math.ceil(skills.length / 2) || 3).map((skill: any, idx: number) => (
+                <div key={idx} className="skill-item fade-in">
+                  <div className="skill-header">
+                    <span className="skill-name">{skill.name}</span>
+                    <span className="skill-value">{skill.percentage || 90}%</span>
+                  </div>
+                  <div className="skill-bar">
+                    <div className="skill-fill" style={{width: `${skill.percentage || 90}%`}}></div>
+                  </div>
+                </div>
+              ))}
+              {skills.length === 0 && (
+                <div className="skill-item fade-in">
+                  <div className="skill-header"><span className="skill-name">Next.js & React</span><span className="skill-value">95%</span></div>
+                  <div className="skill-bar"><div className="skill-fill" style={{width: '95%'}}></div></div>
+                </div>
+              )}
+            </div>
+            <div className="skills-col">
+              <h3 className="skill-group-title fade-in">&nbsp;</h3>
+              {skills.slice(Math.ceil(skills.length / 2) || 3).map((skill: any, idx: number) => (
+                <div key={idx} className="skill-item fade-in">
+                  <div className="skill-header">
+                    <span className="skill-name">{skill.name}</span>
+                    <span className="skill-value">{skill.percentage || 85}%</span>
+                  </div>
+                  <div className="skill-bar">
+                    <div className="skill-fill" style={{width: `${skill.percentage || 85}%`}}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. EXPERIENCE SECTION */}
+      <section id="experience" className="section">
+        <div className="section-container">
+          <h2 className="skill-group-title fade-in" style={{marginBottom: '40px'}}>Pengalaman Utama</h2>
+          <div className="experience-grid">
+            {experiences.map((exp: any, idx: number) => (
+              <div key={idx} className={`experience-card fade-in fade-in-delay-${idx % 4}`}>
+                <div className="exp-role">{exp.company} | {new Date(exp.start_date).getFullYear()}</div>
+                <h3 className="exp-title">{exp.title}</h3>
+                <p className="exp-description">{exp.description}</p>
               </div>
             ))}
+            {experiences.length === 0 && (
+              <>
+                <div className="experience-card fade-in">
+                  <div className="exp-role">Tech Company | 2023 - Present</div>
+                  <h3 className="exp-title">Senior Full Stack Developer</h3>
+                  <p className="exp-description">Membangun aplikasi web skala enterprise menggunakan Next.js dan Supabase. Mengoptimalkan performa dan keamanan sistem.</p>
+                </div>
+                <div className="experience-card fade-in fade-in-delay-1">
+                  <div className="exp-role">Freelance | 2021 - 2023</div>
+                  <h3 className="exp-title">Web Developer</h3>
+                  <p className="exp-description">Mengerjakan berbagai proyek klien dari e-commerce hingga sistem manajemen internal menggunakan stack modern.</p>
+                </div>
+              </>
+            )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* PROJECTS SECTION */}
-        <section className="space-y-10">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold font-mono">
-              <span className="text-accent-blue">03.</span> Arsip_Proyek
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-accent-blue to-transparent" />
+      {/* 6. CERTIFICATIONS SECTION */}
+      <section id="certifications" className="section bg-white/5">
+        <div className="section-container">
+          <div className="certs-layout">
+            <div className="cert-image fade-in">
+              <Image src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" alt="Certifications" width={600} height={500} unoptimized className="rounded-xl" />
+            </div>
+            <div className="cert-content">
+              <h2 className="skill-group-title fade-in" style={{marginBottom: '32px'}}>Sertifikasi & Penghargaan</h2>
+              <div className="cert-list">
+                {displayCerts.map((cert: any, idx: number) => (
+                  <div key={idx} className="cert-item fade-in">
+                    <div className="cert-org">{cert.organization}</div>
+                    <h3 className="cert-name">{cert.title}</h3>
+                    <div className="cert-year">{cert.year}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {projects.map((project) => (
-              <div key={project.id} className="glass-panel group overflow-hidden flex flex-col h-full">
-                <div className="relative h-48 w-full overflow-hidden bg-gray-900">
-                  {project.image_path ? (
-                    <Image 
-                      src={`${R2_URL}/${project.image_path}`} 
-                      alt={project.title} 
-                      fill 
-                      className="object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-700 font-mono">No_Image_Found</div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#151A22] to-transparent opacity-80" />
-                </div>
-                
-                <div className="p-6 flex-1 flex flex-col">
-                  <h3 className="text-xl font-bold text-white group-hover:text-accent-blue transition-colors flex items-center justify-between">
-                    {project.title}
-                    {project.url && <a href={project.url} target="_blank" className="text-gray-500 hover:text-white"><ExternalLink size={20} /></a>}
-                  </h3>
-                  <p className="text-gray-400 text-sm mt-3 flex-1">{project.description}</p>
-                  
-                  {project.technologies && (
-                    <div className="flex flex-wrap gap-2 mt-6">
-                      {project.technologies.split(',').map((tech: string, i: number) => (
-                        <span key={i} className="text-xs font-mono text-accent-purple bg-accent-purple/10 px-2 py-1 rounded">
-                          {tech.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+        </div>
+      </section>
+
+      {/* 7. PORTFOLIO SECTION */}
+      <section id="portfolio" className="section">
+        <div className="section-container">
+          <div className="section-header fade-in">
+            <h2 className="section-title"><FaDesktop className="inline text-cream mr-3" /> Portofolio / Projects</h2>
+          </div>
+          <div className="portfolio-grid">
+            {projects.map((proj: any, idx: number) => (
+              <div key={idx} className={`portfolio-card fade-in fade-in-delay-${idx % 2}`}>
+                <div className="portfolio-category">{proj.is_published ? 'Published' : 'In Development'}</div>
+                <h3 className="portfolio-title">{proj.title}</h3>
+                <p className="portfolio-desc mb-4">{proj.description}</p>
+                <div className="text-sm font-mono text-gray-400 mb-4">{proj.technologies}</div>
+                {proj.url && (
+                  <a href={proj.url} target="_blank" className="text-cream font-semibold hover:text-white flex items-center gap-2">
+                    View Project <FaChevronRight className="text-xs" />
+                  </a>
+                )}
               </div>
             ))}
+            {projects.length === 0 && (
+              <div className="portfolio-card fade-in">
+                <div className="portfolio-category">Web App</div>
+                <h3 className="portfolio-title">Sistem Manajemen Kampus</h3>
+                <p className="portfolio-desc">Aplikasi berbasis web untuk manajemen data mahasiswa dan dosen.</p>
+              </div>
+            )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FOOTER */}
-        <footer id="contact" className="pt-20 pb-10 text-center space-y-6">
-          <h2 className="text-4xl font-bold">Tertarik Berkolaborasi?</h2>
-          <p className="text-gray-400 max-w-lg mx-auto">
-            Sistem saya selalu terbuka untuk koneksi baru. Jika Anda memiliki proyek menantang atau sekadar ingin bertegur sapa, silakan hubungi saya.
-          </p>
-          <a href={`mailto:${profile?.email || 'hello@example.com'}`} className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-white text-black font-bold hover:bg-accent-blue transition-all">
-            <Mail size={20} /> Inisiasi Koneksi
-          </a>
-          
-          <div className="pt-20 border-t border-gray-800 text-sm font-mono text-gray-600 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p>© {new Date().getFullYear()} {profile?.name || 'Tino Lambut'}. All rights reserved.</p>
-            <p>Built with <span className="text-white">Next.js</span> & <span className="text-accent-blue">Supabase</span></p>
+      {/* 8. GALLERY SECTION */}
+      <section id="gallery" className="section bg-white/5">
+        <div className="section-container">
+          <div className="section-header text-center fade-in">
+            <span className="section-subtitle">Galeri Foto</span>
+            <h2 className="section-title">Kumpulan Foto & Kegiatan</h2>
           </div>
-        </footer>
-        
-      </div>
+          <div className="gallery-grid">
+            {gallery.map((item: any, idx: number) => (
+              <div key={idx} className={`gallery-item fade-in fade-in-delay-${idx % 3}`}>
+                <Image src={item.image_url.startsWith('http') ? item.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/portofolio/${item.image_url}`} alt={item.title || "Gallery"} width={400} height={400} unoptimized />
+              </div>
+            ))}
+            {gallery.length === 0 && (
+              <>
+                <div className="gallery-item fade-in"><Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=400&q=80" alt="Gal" width={400} height={400} unoptimized /></div>
+                <div className="gallery-item fade-in fade-in-delay-1"><Image src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80" alt="Gal" width={400} height={400} unoptimized /></div>
+                <div className="gallery-item fade-in fade-in-delay-2"><Image src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=400&q=80" alt="Gal" width={400} height={400} unoptimized /></div>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA SECTION */}
+      <section className="cta-section section">
+        <div className="section-container">
+          <h2 className="fade-in">Mari Terhubung dan Berkolaborasi!</h2>
+          <p className="fade-in fade-in-delay-1">Apakah Anda memiliki proyek menarik atau butuh konsultasi IT? Jangan ragu untuk menghubungi saya melalui WhatsApp.</p>
+          <div className="fade-in fade-in-delay-2">
+            <a href="https://wa.me/628000000000" target="_blank" className="btn-primary">
+              <FaWhatsapp className="text-xl" /> Hubungi Saya di WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="site-footer">
+        <div className="footer-content">
+          <div className="footer-top">
+            <div className="footer-brand fade-in">
+              <Link href="#home" className="logo-text">
+                {profile?.name?.split(' ')[0] || "Tino"}<span>.</span>
+              </Link>
+              <p>Personal branding, website, cepat, ringan, aman, nyaman, konsultasi gratis.</p>
+            </div>
+            <div className="footer-links-wrap fade-in fade-in-delay-1">
+              <h4 className="footer-title">Quick Link</h4>
+              <ul className="footer-links">
+                <li><Link href="#home">Home</Link></li>
+                <li><Link href="#about">Tentang</Link></li>
+                <li><Link href="#services">Layanan</Link></li>
+                <li><Link href="#portfolio">Portofolio</Link></li>
+              </ul>
+            </div>
+            <div className="footer-social-wrap fade-in fade-in-delay-2">
+              <h4 className="footer-title">Find Me</h4>
+              <div className="footer-social">
+                {profile?.github_url && <a href={profile.github_url} target="_blank"><FaGithub /></a>}
+                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank"><FaLinkedin /></a>}
+                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank"><FaInstagram /></a>}
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom fade-in">
+            <div>&copy; {new Date().getFullYear()} {profile?.name || "Tino Lambut"}. All Rights Reserved.</div>
+            <div>Built with Next.js & Supabase</div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

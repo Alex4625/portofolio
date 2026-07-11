@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Inter, Fira_Code } from "next/font/google";
+import { Plus_Jakarta_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plus-jakarta" });
 const firaCode = Fira_Code({ subsets: ["latin"], variable: "--font-fira-code" });
 
 export const metadata: Metadata = {
-  title: "Portofolio | Cyber & Cloud Engineer",
-  description: "Portofolio profesional dengan Next.js dan Supabase.",
+  title: "Tino Lambut — Full Stack Developer & Cyber Security",
+  description: "Portofolio profesional Tino Lambut. Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif.",
+  keywords: ["portofolio", "developer", "full stack", "cyber security", "web developer"],
+  openGraph: {
+    title: "Tino Lambut — Full Stack Developer",
+    description: "Portofolio profesional Tino Lambut.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -17,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${inter.variable} ${firaCode.variable} antialiased selection:bg-accent-blue selection:text-black`}>
+      <body className={`${plusJakarta.variable} ${firaCode.variable}`}>
         {children}
       </body>
     </html>
