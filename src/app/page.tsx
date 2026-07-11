@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { getProfile, getProjects, getSkills, getExperiences } from '@/../lib/data';
-import { Github, Linkedin, Mail, ExternalLink, Terminal } from 'lucide-react';
+import { Mail, ExternalLink, Terminal } from 'lucide-react';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 
 const R2_URL = "https://pub-bb3ad634e09444a1b3bcbe6d9cdef19e.r2.dev";
 
@@ -48,8 +49,8 @@ export default async function Home() {
             </div>
             
             <div className="flex gap-6 pt-6 text-gray-500">
-              <a href={profile?.github_url || "#"} target="_blank" className="hover:text-accent-blue transition-colors"><Github size={24} /></a>
-              <a href={profile?.linkedin_url || "#"} target="_blank" className="hover:text-accent-blue transition-colors"><Linkedin size={24} /></a>
+              <a href={profile?.github_url || "#"} target="_blank" className="hover:text-accent-blue transition-colors"><FaGithub size={24} /></a>
+              <a href={profile?.linkedin_url || "#"} target="_blank" className="hover:text-accent-blue transition-colors"><FaLinkedin size={24} /></a>
             </div>
           </div>
           
