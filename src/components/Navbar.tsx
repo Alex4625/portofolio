@@ -1,18 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp, FaBars, FaTimes, FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { FaBars, FaGithub, FaInstagram, FaLinkedin, FaTimes } from "react-icons/fa";
+import { text, type DbRow } from "@/../lib/data";
 
 interface NavbarProps {
-  profile: any;
+  profile: DbRow | null;
 }
+
+const menuLinks = [
+  { label: "Home", href: "#home" },
+  { label: "Tentang", href: "#about" },
+  { label: "Layanan", href: "#services" },
+  { label: "Keahlian", href: "#skills" },
+  { label: "Pengalaman", href: "#experience" },
+  { label: "Prestasi", href: "#certifications" },
+  { label: "Portofolio", href: "#portfolio" },
+  { label: "Video", href: "#videos" },
+  { label: "Galeri", href: "#gallery" },
+];
 
 export default function Navbar({ profile }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const firstName = text(profile, ["name", "full_name"], "Tino").split(" ")[0];
+  const githubUrl = text(profile, ["github_url"]);
+  const instagramUrl = text(profile, ["instagram_url"]);
+  const linkedinUrl = text(profile, ["linkedin_url"]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -21,55 +36,36 @@ export default function Navbar({ profile }: NavbarProps) {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = (sidebarOpen || mobileOpen) ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [sidebarOpen, mobileOpen]);
-
-  const menuLinks = [
-    { label: "Home", href: "#home" },
-    { label: "Tentang", href: "#about" },
-    { label: "Layanan", href: "#services" },
-    { label: "Keahlian", href: "#skills" },
-    { label: "Pengalaman", href: "#experience" },
-    { label: "Prestasi", href: "#certifications" },
-    { label: "Portofolio", href: "#portfolio" },
-    { label: "Galeri", href: "#gallery" },
-  ];
-
-  const avatarUrl = profile?.avatar_path?.startsWith('http') 
-    ? profile.avatar_path 
-    : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80";
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   return (
     <>
-      {/* ===== HEADER ===== */}
       <header className={`header ${scrolled ? "scrolled" : ""}`}>
         <div className="container">
           <div className="header-content">
             <div className="logo">
-              <Link href="#home">{profile?.name?.split(' ')[0] || "Tino"}.</Link>
+              <Link href="#home">{firstName}.</Link>
             </div>
 
             <nav className="main-menu">
-              {menuLinks.map(l => (
-                <Link key={l.label} href={l.href}>{l.label}</Link>
+              {menuLinks.map((link) => (
+                <Link key={link.label} href={link.href}>
+                  {link.label}
+                </Link>
               ))}
             </nav>
 
             <div className="header-right">
-              <div className="social-link" style={{ display: 'var(--show-desktop, flex)' }}>
-                {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
-                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
-                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
+              <div className="social-link">
+                {githubUrl && <a href={githubUrl} target="_blank" rel="noopener" aria-label="GitHub"><FaGithub /></a>}
+                {instagramUrl && <a href={instagramUrl} target="_blank" rel="noopener" aria-label="Instagram"><FaInstagram /></a>}
+                {linkedinUrl && <a href={linkedinUrl} target="_blank" rel="noopener" aria-label="LinkedIn"><FaLinkedin /></a>}
               </div>
-
-              {/* Desktop sidebar toggle */}
-              <button className="menu-bars" onClick={() => setSidebarOpen(true)} style={{ display: 'none' }} id="desktop-sidebar-btn">
-                <FaBars />
-              </button>
-
-              {/* Mobile hamburger */}
-              <button className="menu-bars mobile-only" onClick={() => setMobileOpen(true)}>
+              <button className="menu-bars mobile-only" type="button" onClick={() => setMobileOpen(true)} aria-label="Buka menu">
                 <FaBars />
               </button>
             </div>
@@ -77,71 +73,25 @@ export default function Navbar({ profile }: NavbarProps) {
         </div>
       </header>
 
-      {/* ===== SIDEBAR (Desktop) ===== */}
-      <div className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`} onClick={() => setSidebarOpen(false)} />
-      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-top">
-          <Link href="#home" className="logo" style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--accent)' }}>
-            {profile?.name?.split(' ')[0] || "Tino"}.
-          </Link>
-          <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
-            <FaTimes />
-          </button>
-        </div>
-
-        <div className="sidebar-image">
-          <Image src={avatarUrl} alt={profile?.name || "Profile"} width={400} height={300} unoptimized />
-        </div>
-
-        <h5>{profile?.profession || "Full Stack Developer"} 🚀</h5>
-        <p className="disc">{profile?.bio || "Saya adalah seorang Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif."}</p>
-
-        <div className="sidebar-contact">
-          {profile?.email && (
-            <div className="single-contact">
-              <FaEnvelope />
-              <div className="info">
-                <span>Mail me</span>
-                <a href={`mailto:${profile.email}`} className="value">{profile.email}</a>
-              </div>
-            </div>
-          )}
-          <div className="single-contact">
-            <FaMapMarkerAlt />
-            <div className="info">
-              <span>My Address</span>
-              <span className="value">Indonesia</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="sidebar-social-title">find with me</div>
-        <div className="social-link">
-          {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
-          {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
-          {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
-        </div>
-      </aside>
-
-      {/* ===== MOBILE MENU ===== */}
-      <div className={`sidebar-overlay ${mobileOpen ? "open" : ""}`} onClick={() => setMobileOpen(false)} />
       <div className={`mobile-menu ${mobileOpen ? "open" : ""}`}>
-        <button className="mobile-close" onClick={() => setMobileOpen(false)}>
+        <button className="mobile-close" type="button" onClick={() => setMobileOpen(false)} aria-label="Tutup menu">
           <FaTimes />
         </button>
         <ul>
-          {menuLinks.map(l => (
-            <li key={l.label}>
-              <Link href={l.href} onClick={() => setMobileOpen(false)}>{l.label}</Link>
+          {menuLinks.map((link) => (
+            <li key={link.label}>
+              <Link href={link.href} onClick={() => setMobileOpen(false)}>
+                {link.label}
+              </Link>
             </li>
           ))}
         </ul>
-        <div style={{ marginTop: '40px' }}>
+        <div style={{ marginTop: "36px" }}>
           <div className="sidebar-social-title">find with me</div>
           <div className="social-link">
-            {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
-            {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
-            {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
+            {githubUrl && <a href={githubUrl} target="_blank" rel="noopener" aria-label="GitHub"><FaGithub /></a>}
+            {instagramUrl && <a href={instagramUrl} target="_blank" rel="noopener" aria-label="Instagram"><FaInstagram /></a>}
+            {linkedinUrl && <a href={linkedinUrl} target="_blank" rel="noopener" aria-label="LinkedIn"><FaLinkedin /></a>}
           </div>
         </div>
       </div>

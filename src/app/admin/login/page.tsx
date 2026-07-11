@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { loginAction } from "@/app/admin/actions";
 import { useRouter } from "next/navigation";
+import { Lock } from "lucide-react";
+import { loginAction } from "@/app/admin/actions";
 
 export default function LoginPage() {
   const [password, setPassword] = useState("");
@@ -10,50 +11,48 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
     setError("");
 
-    const res = await loginAction(password);
-    if (res.success) {
+    const result = await loginAction(password);
+    if (result.success) {
       router.push("/admin");
-    } else {
-      setError(res.error || "Gagal login");
-      setLoading(false);
+      router.refresh();
+      return;
     }
+
+    setError(result.error || "Gagal login");
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center p-4">
-      <div className="max-w-md w-full glass-panel p-8 space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold font-mono text-accent-blue">Akses_Terbatas</h1>
-          <p className="text-gray-400 mt-2">Masukkan Master Password</p>
+    <div className="login-page">
+      <form onSubmit={handleLogin} className="glass-panel login-card admin-form">
+        <div>
+          <Lock size={28} color="var(--accent-red)" />
+          <h1>Akses Admin</h1>
+          <p>Masukkan master password untuk mengelola konten portofolio.</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#151A22] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-blue transition-colors font-mono"
-              placeholder="••••••••••••"
-              required
-            />
-            {error && <p className="text-red-400 text-sm">{error}</p>}
-          </div>
+        <label className="field">
+          <span>Password</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Master password"
+            required
+          />
+        </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-accent-blue hover:bg-white text-black font-bold py-3 rounded-lg transition-all"
-          >
-            {loading ? "Memverifikasi..." : "Inisiasi Akses"}
-          </button>
-        </form>
-      </div>
+        {error && <p style={{ color: "#ff9aa3", margin: 0 }}>{error}</p>}
+
+        <button type="submit" disabled={loading} className="primary-btn">
+          {loading ? "Memverifikasi..." : "Masuk"}
+        </button>
+      </form>
     </div>
   );
 }

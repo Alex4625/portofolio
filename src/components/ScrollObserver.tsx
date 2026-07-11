@@ -7,16 +7,16 @@ export default function ScrollObserver() {
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
-    // Intersection Observer for fade-in animations
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
+          entry.target.classList.add('in-view');
         }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    document.querySelectorAll('.fade-up, .zoom-in').forEach(el => observer.observe(el));
+    document.querySelectorAll('.fade-up, .zoom-in, .reveal, .skill-fill').forEach(el => observer.observe(el));
 
     // Scroll to top button visibility
     const handleScroll = () => setShowTop(window.scrollY > 400);

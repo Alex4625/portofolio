@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Fira_Code } from "next/font/google";
+import { Inter, JetBrains_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plus-jakarta" });
-const firaCode = Fira_Code({ subsets: ["latin"], variable: "--font-fira-code" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
 
 export const metadata: Metadata = {
   title: "Tino Lambut — Full Stack Developer & Cyber Security",
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${plusJakarta.variable} ${firaCode.variable}`}>
+      <body className={`${outfit.variable} ${inter.variable} ${jetbrains.variable}`}>
         {children}
       </body>
     </html>

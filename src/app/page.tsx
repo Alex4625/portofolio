@@ -1,463 +1,410 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp, FaArrowRight, FaDesktop, FaChartLine, FaChartPie, FaBullhorn, FaUserTie, FaUsersViewfinder, FaMicrophone } from "react-icons/fa6";
-import { getProfile, getProjects, getSkills, getExperiences, getServices, getCertifications, getGallery } from "@/../lib/data";
+import type { CSSProperties } from "react";
+import {
+  ArrowRight,
+  Mail,
+  MapPin,
+  Phone,
+  ExternalLink,
+} from "lucide-react";
+import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa6";
 import Navbar from "@/components/Navbar";
 import ScrollObserver from "@/components/ScrollObserver";
+import MediaShowcase from "@/components/MediaShowcase";
+import { getSiteData, imageUrl, number, techList, text, type DbRow } from "@/../lib/data";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
+
+const fallbackProfile: DbRow = {
+  name: "Tino Lambut",
+  profession: "Full Stack Developer",
+  hero_badge: "Full Stack Developer",
+  bio: "Saya membangun aplikasi web modern, aman, dan siap deploy dengan Next.js, React, Node.js, Supabase, dan Cloudflare.",
+  about_text:
+    "Saya adalah developer yang senang menyatukan desain antarmuka, arsitektur backend, keamanan aplikasi, dan deployment cloud menjadi produk yang rapi. Fokus saya adalah membangun sistem yang enak dipakai, mudah dirawat, dan cukup tangguh untuk tumbuh bersama kebutuhan bisnis.",
+  email: "tino@example.com",
+  phone: "+62 800 0000 0000",
+  location: "Indonesia",
+  github_url: "https://github.com",
+  linkedin_url: "https://linkedin.com",
+  instagram_url: "https://instagram.com",
+  whatsapp_url: "https://wa.me/628000000000",
+  avatar_path: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=80",
+  about_image_path: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+};
+
+const fallbackStats = [
+  {
+    value: "10+",
+    label: "Proyek Web",
+    title: "10+ Proyek Web Diselesaikan",
+    desc: "Next.js, React, Node.js, dan infrastruktur cloud modern untuk landing page sampai sistem operasional.",
+  },
+  {
+    value: "99.9%",
+    label: "Uptime",
+    title: "Deployment Multi-Cloud Stabil",
+    desc: "Arsitektur AWS + Cloudflare dengan CI/CD pipeline otomatis untuk menjaga layanan tetap tersedia.",
+  },
+  {
+    value: "15+",
+    label: "Security Finding",
+    title: "Kerentanan Kritis Ditemukan",
+    desc: "Security audit dan penetration testing untuk mengurangi risiko sebelum sistem masuk produksi.",
+  },
+  {
+    value: "100K+",
+    label: "Request / Hari",
+    title: "API Trafik Tinggi",
+    desc: "Microservices Node.js dan PostgreSQL untuk menangani trafik besar dengan latensi konsisten.",
+  },
+];
+
+const fallbackServices = [
+  { title: "Full Stack Web Development", description: "(Next.js, React, Node.js, Laravel)", order_num: 1 },
+  { title: "Cyber Security & Penetration Testing", description: "(Audit keamanan, vulnerability assessment)", order_num: 2 },
+  { title: "Cloud Architecture & DevOps", description: "(Cloudflare, AWS, CI/CD pipeline)", order_num: 3 },
+  { title: "Database Design & API Integration", description: "(PostgreSQL, Supabase, REST API)", order_num: 4 },
+];
+
+const fallbackSkills = [
+  { name: "Next.js & React", category: "Frontend", percentage: 92 },
+  { name: "TypeScript & JavaScript", category: "Frontend", percentage: 90 },
+  { name: "Node.js & REST API", category: "Backend", percentage: 88 },
+  { name: "Supabase & PostgreSQL", category: "Backend", percentage: 84 },
+  { name: "Cloudflare & R2", category: "Tools", percentage: 82 },
+  { name: "Security Testing", category: "Tools", percentage: 86 },
+];
+
+const fallbackExperiences = [
+  {
+    role: "Full Stack Developer",
+    company: "Tech Company",
+    start_date: "2023-01-01",
+    description: "Membangun aplikasi web skala enterprise menggunakan Next.js, React, Node.js, dan cloud deployment.",
+  },
+  {
+    role: "Freelance Web Developer",
+    company: "Self-Employed",
+    start_date: "2021-01-01",
+    description: "Mengerjakan landing page, dashboard internal, e-commerce, dan integrasi API untuk berbagai klien.",
+  },
+  {
+    role: "IT Security Analyst",
+    company: "Cyber Security Firm",
+    start_date: "2022-01-01",
+    description: "Melakukan vulnerability assessment, penetration testing, dan laporan rekomendasi perbaikan.",
+  },
+];
+
+const fallbackCerts = [
+  { organization: "CompTIA", title: "CompTIA Security+ Certification", year: "2024" },
+  { organization: "AWS", title: "AWS Certified Developer Associate", year: "2023" },
+  { organization: "Meta", title: "Front-End Developer Professional Certificate", year: "2022" },
+  { organization: "Coursera", title: "Full Stack Web Development Specialization", year: "2021" },
+];
+
+const fallbackProjects = [
+  {
+    title: "Enterprise Dashboard Application",
+    category: "Full Stack",
+    year: "2024",
+    strategy: "Membangun dashboard analitik real-time dengan Next.js, Supabase, dan Cloudflare.",
+    result: "Workflow operasional lebih cepat dan laporan internal lebih mudah dipantau.",
+    technologies: "Next.js, Supabase, Cloudflare",
+    image_path: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80",
+  },
+  {
+    title: "Web Application Security Audit",
+    category: "Cyber Security",
+    year: "2024",
+    strategy: "Melakukan audit keamanan dan validasi celah pada aplikasi web korporat.",
+    result: "15+ temuan kritis terdokumentasi sebelum sistem dieksploitasi.",
+    technologies: "OWASP, Burp Suite, Reporting",
+    image_path: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=900&q=80",
+  },
+];
+
+const fallbackVideos = [
+  {
+    title: "Project Demo",
+    thumbnail_image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=420&q=80",
+    embed_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+  },
+];
+
+const fallbackGallery = [
+  { title: "Workshop", image_path: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&q=80" },
+  { title: "Team Session", image_path: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&q=80" },
+  { title: "Development", image_path: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=700&q=80" },
+];
+
+function parseStats(profile: DbRow) {
+  const stats = profile.stats_json;
+  if (Array.isArray(stats) && stats.length > 0) return stats as typeof fallbackStats;
+  return fallbackStats;
+}
+
+function formatYearRange(row: DbRow) {
+  const start = text(row, ["start_date"]);
+  const end = text(row, ["end_date"], "Sekarang");
+  const startYear = start ? new Date(start).getFullYear().toString() : "";
+  const endYear = end === "Sekarang" ? end : new Date(end).getFullYear().toString();
+  return [startYear, endYear].filter(Boolean).join(" - ");
+}
 
 export default async function Home() {
-  const profile = await getProfile() || {
-    name: "Tino Lambut",
-    profession: "Full Stack Developer",
-    bio: "Saya adalah seorang Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif. Dengan latar belakang pendidikan di bidang Teknologi Informasi, saya memiliki keahlian dalam pengembangan Front-End maupun Back-End menggunakan teknologi terkini.",
-    email: "tino@example.com",
-    github_url: "https://github.com",
-    linkedin_url: "https://linkedin.com",
-    instagram_url: "https://instagram.com",
-    avatar_path: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
-  };
+  const data = await getSiteData();
+  const profile = data.profile || fallbackProfile;
+  const services = data.services.length ? data.services : fallbackServices;
+  const skills = data.skills.length ? data.skills : fallbackSkills;
+  const experiences = data.experiences.length ? data.experiences : fallbackExperiences;
+  const certifications = data.certifications.length ? data.certifications : fallbackCerts;
+  const projects = data.projects.length ? data.projects : fallbackProjects;
+  const videos = data.videos.length ? data.videos : fallbackVideos;
+  const galleries = data.galleries.length ? data.galleries : fallbackGallery;
+  const stats = parseStats(profile);
 
-  const projects = await getProjects();
-  const skills = await getSkills();
-  const experiences = await getExperiences();
-  const services = await getServices();
-  const certifications = await getCertifications();
-  const gallery = await getGallery();
+  const name = text(profile, ["name", "full_name"], "Tino Lambut");
+  const profession = text(profile, ["profession"], "Full Stack Developer");
+  const heroBadge = text(profile, ["hero_badge"], profession);
+  const bio = text(profile, ["bio"], text(fallbackProfile, ["bio"]));
+  const aboutText = text(profile, ["about_text"], text(profile, ["bio"], text(fallbackProfile, ["about_text"])));
+  const avatarUrl = imageUrl(profile, ["hero_image_path", "avatar_path"], text(fallbackProfile, ["avatar_path"]));
+  const aboutImageUrl = imageUrl(profile, ["about_image_path", "avatar_path"], text(fallbackProfile, ["about_image_path"]));
+  const whatsappUrl = text(profile, ["whatsapp_url"], "https://wa.me/628000000000");
 
-  // Fallback data saat database kosong
-  const fallbackHighlights = [
-    { icon: "chart-line", title: "10+ Proyek Web Terselesaikan dengan Teknologi Modern", desc: "Menggunakan Next.js, React, Node.js dan infrastruktur cloud modern untuk membangun aplikasi skala enterprise." },
-    { icon: "chart-pie", title: "Optimasi Performa & Keamanan pada Setiap Proyek", desc: "Implementasi best practices keamanan web, penetration testing, dan optimalisasi performa aplikasi." },
-    { icon: "bullhorn", title: "Full Stack Development dari Konsep hingga Deployment", desc: "Membangun solusi end-to-end mulai dari desain database, backend API, frontend UI, hingga deployment di cloud." },
-  ];
-
-  const fallbackServices = [
-    { order_num: 1, title: "Full Stack Web Development", description: "(Next.js, React, Node.js, Laravel)" },
-    { order_num: 2, title: "Cyber Security & Penetration Testing", description: "(Web Security, Vulnerability Assessment)" },
-    { order_num: 3, title: "Cloud Architecture & DevOps", description: "(AWS, Cloudflare, CI/CD Pipeline)" },
-    { order_num: 4, title: "Database Design & Management", description: "(PostgreSQL, Supabase, MySQL, MongoDB)" },
-    { order_num: 5, title: "API Development & Integration", description: "(RESTful API, GraphQL, Third-party APIs)" },
-  ];
-
-  const fallbackSkills = [
-    { name: "Next.js & React", value: "Expert" },
-    { name: "Node.js & Express", value: "Advanced" },
-    { name: "Cyber Security & Pentesting", value: "Advanced" },
-    { name: "TypeScript & JavaScript", value: "Expert" },
-    { name: "Cloud & DevOps (AWS, CF)", value: "Advanced" },
-    { name: "Database (PostgreSQL, MySQL)", value: "Advanced" },
-  ];
-
-  const fallbackExperiences = [
-    { sub: "Full Stack Developer", title: "Tech Company | 2023 - Sekarang", desc: "Membangun dan mengelola aplikasi web skala enterprise menggunakan Next.js, React, dan Node.js. Bertanggung jawab atas arsitektur frontend-backend dan deployment cloud." },
-    { sub: "Freelance Web Developer", title: "Self-Employed | 2021 - 2023", desc: "Mengerjakan berbagai proyek klien dari landing page, e-commerce, hingga sistem manajemen internal menggunakan teknologi modern." },
-    { sub: "IT Security Analyst", title: "Cyber Security Firm | 2022", desc: "Melakukan vulnerability assessment dan penetration testing pada aplikasi web klien korporat. Menyusun laporan keamanan dan rekomendasi perbaikan." },
-    { sub: "Junior Developer", title: "Software House | 2020 - 2021", desc: "Mengembangkan fitur-fitur pada aplikasi web menggunakan Laravel dan Vue.js. Berkolaborasi dalam tim agile untuk delivery proyek tepat waktu." },
-  ];
-
-  const fallbackCerts = [
-    { org: "CompTIA", name: "CompTIA Security+ Certification", year: "2024" },
-    { org: "AWS", name: "AWS Certified Developer – Associate", year: "2023" },
-    { org: "Google", name: "Google IT Support Professional Certificate", year: "2023" },
-    { org: "Meta", name: "Meta Front-End Developer Professional Certificate", year: "2022" },
-    { org: "Coursera", name: "Full Stack Web Development Specialization", year: "2021" },
-  ];
-
-  const fallbackGallery = [
-    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=500&q=80",
-  ];
-
-  const displayServices = services.length > 0 ? services : fallbackServices;
-  const displayCerts = certifications.length > 0 ? certifications : fallbackCerts;
-  const displayGallery = gallery.length > 0 ? gallery : fallbackGallery.map((url, i) => ({ image_url: url, title: `Gallery ${i+1}` }));
-
-  const avatarUrl = profile?.avatar_path?.startsWith('http')
-    ? profile.avatar_path
-    : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
-
-  const servicesImageUrl = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80";
-  const certsImageUrl = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
+  const groupedSkills = skills.reduce<Record<string, DbRow[]>>((groups, skill) => {
+    const category = text(skill, ["category"], "Tools");
+    groups[category] = [...(groups[category] || []), skill];
+    return groups;
+  }, {});
 
   return (
     <main>
       <ScrollObserver />
       <Navbar profile={profile} />
 
-      {/* ========================================
-          1. HERO BANNER
-          ======================================== */}
-      <section id="home" className="banner">
-        <div className="container">
-          <div className="banner-wrapper">
-            <div className="banner-row">
-              {/* Left Column: Name + CTA */}
-              <div className="banner-left">
-                <span className="sub-title fade-up delay-1">Hello saya</span>
-                <h1 className="title fade-up delay-2">{profile?.name}</h1>
-                <div className="fade-up delay-3">
-                  <Link href="#about" className="tmp-btn">
-                    <span>Tentang Saya</span>
-                    <FaArrowRight className="icon-arrow" />
-                  </Link>
-                </div>
-              </div>
+      <section id="home" className="hero-section">
+        <div className="hero-watermark">{profession}</div>
+        <div className="container hero-grid">
+          <aside className="hero-rail">
+            <span>01</span>
+            <div />
+            <a href={text(profile, ["github_url"], "#")} aria-label="GitHub"><FaGithub size={18} /></a>
+            <a href={text(profile, ["instagram_url"], "#")} aria-label="Instagram"><FaInstagram size={18} /></a>
+            <a href={text(profile, ["linkedin_url"], "#")} aria-label="LinkedIn"><FaLinkedin size={18} /></a>
+          </aside>
 
-              {/* Right Column: About + Social */}
-              <div className="banner-right">
-                <div className="about-me fade-up delay-1">
-                  <h3 className="title">About Me</h3>
-                  <p className="para">{profile?.bio}</p>
-                </div>
-                <div className="find-me-on fade-up delay-2">
-                  <h2 className="find-me-on-title">Find me on</h2>
-                  <div className="social-link banner">
-                    {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
-                    {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
-                    {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
-                  </div>
-                </div>
-              </div>
+          <div className="hero-copy reveal">
+            <span className="role-badge">{heroBadge}</span>
+            <h1>{name}</h1>
+            <p>{bio}</p>
+            <div className="hero-contact">
+              <a href={`mailto:${text(profile, ["email"], "tino@example.com")}`}><Mail size={16} />{text(profile, ["email"], "tino@example.com")}</a>
+              <span><Phone size={16} />{text(profile, ["phone"], "+62 800 0000 0000")}</span>
+              <span><MapPin size={16} />{text(profile, ["location"], "Indonesia")}</span>
             </div>
-
-            {/* Center Profile Image */}
-            <div className="banner-bg-img zoom-in delay-2">
-              <Image src={avatarUrl} alt={profile?.name || "Profile"} width={500} height={650} unoptimized priority />
+            <div className="hero-actions">
+              <Link href="#about" className="primary-btn">Tentang Saya <ArrowRight size={18} /></Link>
+              {text(profile, ["cv_pdf_path"]) && <a className="ghost-btn" href={imageUrl(profile, ["cv_pdf_path"])}>Unduh CV</a>}
             </div>
+          </div>
 
-            {/* Background Text */}
-            <div className="banner-bg-text">{profile?.profession || "Developer"}</div>
+          <div className="hero-image reveal">
+            <Image src={avatarUrl} alt={name} width={620} height={760} priority unoptimized />
           </div>
         </div>
       </section>
 
-      {/* ========================================
-          STAT HIGHLIGHT CARDS (below hero)
-          ======================================== */}
-      <section className="section-gap-top">
+      <section id="about" className="section-block section-alt">
+        <div className="container about-layout">
+          <div className="about-photo reveal">
+            <Image src={aboutImageUrl} alt={`${name} working`} width={680} height={760} unoptimized />
+          </div>
+          <div className="about-content">
+            <span className="section-kicker">About Me</span>
+            <h2>{profession}</h2>
+            <p>{aboutText}</p>
+            <div className="stat-number-row">
+              <div><strong>{stats[0]?.value || "10+"}</strong><span>{stats[0]?.label || "Projects"}</span></div>
+              <div><strong>{stats[1]?.value || "5+"}</strong><span>{stats[1]?.label || "Years"}</span></div>
+            </div>
+            <div className="stat-callouts">
+              {stats.map((item, index) => (
+                <article className="stat-callout reveal" key={`${item.title}-${index}`}>
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" className="section-block">
         <div className="container">
-          <div className="service-cards-row">
-            {fallbackHighlights.map((item, idx) => (
-              <div key={idx} className={`service-card-v1 fade-up delay-${idx + 1}`}>
-                <div className="icon">
-                  {idx === 0 && <FaChartLine />}
-                  {idx === 1 && <FaChartPie />}
-                  {idx === 2 && <FaBullhorn />}
+          <div className="section-heading">
+            <span className="section-kicker">Layanan</span>
+            <h2>Saya terbuka untuk kolaborasi, freelance project, maupun kerjasama profesional di bidang</h2>
+          </div>
+          <div className="service-list">
+            {services.map((service, index) => (
+              <article className="service-row reveal" key={text(service, ["id"], String(index))}>
+                <span>{String(number(service, ["order_num", "order_column"], index + 1)).padStart(2, "0")}</span>
+                <div>
+                  <h3>{text(service, ["title"], "Layanan")}</h3>
+                  <p>{text(service, ["description"], "(Konsultasi dan implementasi)")}</p>
                 </div>
-                <h4 className="card-title">{item.title}</h4>
-                <p className="card-para">{item.desc}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="skills" className="section-block section-alt">
+        <div className="container">
+          <div className="section-heading">
+            <span className="section-kicker">Keahlian</span>
+            <h2>Stack Teknis</h2>
+          </div>
+          <div className="skills-layout">
+            {Object.entries(groupedSkills).map(([category, items]) => (
+              <div className="skill-group reveal" key={category}>
+                <h3>{category}</h3>
+                {items.map((skill) => {
+                  const pct = number(skill, ["percentage"], 0);
+                  return (
+                    <div className="skill-line" key={text(skill, ["id", "name"])}>
+                      <div><span>{text(skill, ["name"], "Skill")}</span><em>{pct}%</em></div>
+                      <div className="skill-track"><span className="skill-fill" style={{ "--target-width": `${pct}%` } as CSSProperties} /></div>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ========================================
-          2. ABOUT SECTION
-          ======================================== */}
-      <section id="about" className="section-gap">
-        <div className="container">
-          <div className="about-grid">
-            <div className="about-left">
-              <div className="years-card fade-up delay-1">
-                <div className="number">5+</div>
-                <div className="label">years of experience</div>
-              </div>
-              <div className="info-card fade-up delay-2">
-                <div className="icon-box"><FaDesktop /></div>
-                <div className="card-info">
-                  <div className="card-title">Projects Completed</div>
-                  <div className="card-para">{projects.length > 0 ? `${projects.length}+` : "15+"}</div>
-                </div>
-              </div>
-            </div>
-            <div className="about-right">
-              <div className="section-subtitle fade-up">About Me</div>
-              <h2 className="section-title fade-up delay-1">
-                {profile?.profession || "Full Stack Developer"} | Tech Enthusiast & Problem Solver
-              </h2>
-              <p className="section-description fade-up delay-2">{profile?.bio}</p>
-            </div>
+      <section id="experience" className="section-block">
+        <div className="container timeline-layout">
+          <div className="section-heading compact">
+            <span className="section-kicker">Experience</span>
+            <h2>Pengalaman Utama</h2>
+          </div>
+          <div className="timeline-list">
+            {experiences.map((exp, index) => (
+              <article className="timeline-item reveal" key={text(exp, ["id"], String(index))}>
+                <h3>{text(exp, ["role", "title"], "Developer")}</h3>
+                <div>{text(exp, ["company", "company_name"], "Company")} | {formatYearRange(exp)}</div>
+                <p>{text(exp, ["description"])}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ========================================
-          3. SERVICES SECTION
-          ======================================== */}
-      <section id="services" className="section-gap">
+      <section id="certifications" className="section-block section-alt">
         <div className="container">
-          <div className="text-center mb-60">
-            <div className="section-subtitle fade-up">Layanan Tersedia</div>
-            <h2 className="section-title fade-up delay-1">
-              Saya terbuka untuk kolaborasi, freelance project,<br />maupun kerjasama profesional di bidang
-            </h2>
+          <div className="section-heading">
+            <span className="section-kicker">Credentials</span>
+            <h2>Sertifikasi & Penghargaan</h2>
           </div>
-          <div className="services-layout">
-            <div>
-              {displayServices.map((svc: any, idx: number) => (
-                <div key={idx} className={`service-list-item fade-up delay-${(idx % 5) + 1}`}>
-                  <div>
-                    <span className="num">{svc.order_num || idx + 1}.</span>
-                    <span className="name">{svc.title}</span>
-                  </div>
-                  {svc.description && <p className="desc">{svc.description}</p>}
-                </div>
-              ))}
-            </div>
-            <div className="services-image zoom-in delay-1">
-              <Image src={servicesImageUrl} alt="Services" width={600} height={700} unoptimized />
-            </div>
+          <div className="cert-grid">
+            {certifications.map((cert, index) => (
+              <article className="cert-card reveal" key={text(cert, ["id"], String(index))}>
+                <span>{text(cert, ["organization", "org"], "Institution")}</span>
+                <h3>{text(cert, ["title", "name"], "Certification")}</h3>
+                <em>{text(cert, ["year"], "2026")}</em>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ========================================
-          4. SKILLS / EXPERTISE SECTION
-          ======================================== */}
-      <section id="skills" className="section-gap">
+      <section id="portfolio" className="section-block">
         <div className="container">
-          <div className="skills-grid">
-            <div>
-              <h2 className="custom-title fade-up">
-                Keahlian Utama <span className="line"></span>
-              </h2>
-              {(skills.length > 0 ? skills.slice(0, Math.ceil(skills.length / 2)) : fallbackSkills.slice(0, 3)).map((s: any, idx: number) => (
-                <div key={idx} className="progress-charts fade-up">
-                  <h6 className="heading">{s.name}</h6>
-                  <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${s.percentage || 100}%` }}>
-                      <span className="label">{s.value || s.percentage ? `${s.percentage}%` : "Expert"}</span>
-                    </div>
+          <div className="section-heading">
+            <span className="section-kicker">Portfolio</span>
+            <h2>Projects Terpilih</h2>
+          </div>
+          <div className="project-grid">
+            {projects.map((project, index) => (
+              <article className="project-card reveal" key={text(project, ["id"], String(index))}>
+                <Image
+                  src={imageUrl(project, ["image_path"], text(fallbackProjects[index % fallbackProjects.length], ["image_path"]))}
+                  alt={text(project, ["title"], "Project")}
+                  width={760}
+                  height={430}
+                  unoptimized
+                />
+                <div className="project-body">
+                  <span>{text(project, ["category", "technologies"], "Web Development")}</span>
+                  <h3>{text(project, ["title"], "Project")} <em>{text(project, ["year"])}</em></h3>
+                  <p><strong>Strategi:</strong> {text(project, ["strategy", "description"], "Membangun solusi web sesuai kebutuhan produk.")}</p>
+                  <p><strong>Hasil:</strong> {text(project, ["result"], "Produk lebih mudah dipakai, dipantau, dan dikembangkan.")}</p>
+                  <div className="project-tags">{techList(project).slice(0, 4).map((tag) => <small key={tag}>{tag}</small>)}</div>
+                  <div className="project-links">
+                    {text(project, ["demo_url", "url"]) && <a href={text(project, ["demo_url", "url"])} target="_blank" rel="noopener">Demo <ExternalLink size={14} /></a>}
+                    {text(project, ["github_url"]) && <a href={text(project, ["github_url"])} target="_blank" rel="noopener">GitHub <FaGithub size={14} /></a>}
                   </div>
                 </div>
-              ))}
-            </div>
-            <div>
-              <h2 className="custom-title fade-up">&nbsp;<span className="line"></span></h2>
-              {(skills.length > 0 ? skills.slice(Math.ceil(skills.length / 2)) : fallbackSkills.slice(3)).map((s: any, idx: number) => (
-                <div key={idx} className="progress-charts fade-up">
-                  <h6 className="heading">{s.name}</h6>
-                  <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${s.percentage || 100}%` }}>
-                      <span className="label">{s.value || s.percentage ? `${s.percentage}%` : "Advanced"}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ========================================
-          5. EXPERIENCE SECTION
-          ======================================== */}
-      <section id="experience" className="section-gap">
+      <MediaShowcase
+        videos={videos.map((video, index) => ({
+          id: text(video, ["id"], String(index)),
+          title: text(video, ["title"], "Project Demo"),
+          thumbnail: imageUrl(video, ["thumbnail_image"], text(fallbackVideos[0], ["thumbnail_image"])),
+          embedUrl: text(video, ["embed_url"], "https://www.youtube.com/embed/dQw4w9WgXcQ"),
+        }))}
+        galleries={galleries.map((item, index) => ({
+          id: text(item, ["id"], String(index)),
+          title: text(item, ["caption", "title"], `Gallery ${index + 1}`),
+          image: imageUrl(item, ["image_path", "image_url"], text(fallbackGallery[index % fallbackGallery.length], ["image_path"])),
+        }))}
+      />
+
+      <section className="section-block cta-section">
         <div className="container">
-          <h2 className="custom-title mb-32 fade-up">
-            Pengalaman Utama <span className="line"></span>
-          </h2>
-          <div className="experience-grid">
-            {experiences.length > 0
-              ? experiences.map((exp: any, idx: number) => (
-                  <div key={idx} className={`experience-card fade-up delay-${(idx % 4) + 1}`}>
-                    <h4 className="exp-sub-title">{exp.title || exp.role}</h4>
-                    <h2 className="exp-title">{exp.company} | {exp.start_date ? new Date(exp.start_date).getFullYear() : ""}</h2>
-                    <p className="exp-para">{exp.description}</p>
-                  </div>
-                ))
-              : fallbackExperiences.map((exp, idx) => (
-                  <div key={idx} className={`experience-card fade-up delay-${(idx % 4) + 1}`}>
-                    <h4 className="exp-sub-title">{exp.sub}</h4>
-                    <h2 className="exp-title">{exp.title}</h2>
-                    <p className="exp-para">{exp.desc}</p>
-                  </div>
-                ))
-            }
-          </div>
+          <h2>Mari Terhubung dan Berkolaborasi</h2>
+          <p>Punya proyek menarik atau butuh konsultasi IT? Saya siap membantu dari ide sampai deployment.</p>
+          <a href={whatsappUrl} className="primary-btn" target="_blank" rel="noopener">Hubungi Saya via WhatsApp <ArrowRight size={18} /></a>
         </div>
       </section>
 
-      {/* ========================================
-          6. CERTIFICATIONS / AWARDS SECTION
-          ======================================== */}
-      <section id="certifications" className="section-gap">
-        <div className="container">
-          <div className="certs-layout">
-            <div className="cert-image zoom-in delay-1">
-              <Image src={certsImageUrl} alt="Certifications" width={600} height={500} unoptimized />
-            </div>
-            <div>
-              <h2 className="custom-title mb-32 fade-up">
-                Sertifikasi & Penghargaan <span className="line"></span>
-              </h2>
-              {displayCerts.map((cert: any, idx: number) => (
-                <div key={idx} className={`cert-item fade-up delay-${(idx % 5) + 1}`}>
-                  <div className="cert-org">{cert.org || cert.organization}</div>
-                  <h3 className="cert-name">{cert.name || cert.title}</h3>
-                  <div className="cert-year">{cert.year}</div>
-                </div>
-              ))}
+      <footer className="site-footer">
+        <div className="container footer-grid">
+          <div>
+            <Link href="#home" className="footer-brand">{name.split(" ")[0]}.</Link>
+            <p>Personal portfolio berbasis Next.js, Supabase, dan Cloudflare R2.</p>
+            <div className="footer-social">
+              <a href={text(profile, ["github_url"], "#")}><FaGithub size={18} /></a>
+              <a href={text(profile, ["instagram_url"], "#")}><FaInstagram size={18} /></a>
+              <a href={text(profile, ["linkedin_url"], "#")}><FaLinkedin size={18} /></a>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ========================================
-          7. PORTFOLIO / PROJECTS SECTION
-          ======================================== */}
-      <section id="portfolio" className="section-gap">
-        <div className="container">
-          <div className="portfolio-header fade-up">
-            <h2 className="portfolio-title-main">
-              <FaMicrophone /> Portofolio / Projects
-            </h2>
+          <div>
+            <h3>Quick Link</h3>
+            <Link href="#about">Tentang</Link>
+            <Link href="#services">Layanan</Link>
+            <Link href="#skills">Keahlian</Link>
+            <Link href="#portfolio">Portofolio</Link>
           </div>
-          <div className="portfolio-grid">
-            {projects.length > 0 ? (
-              <>
-                <div className="resume-widget">
-                  {projects.slice(0, Math.ceil(projects.length / 2)).map((proj: any, idx: number) => (
-                    <div key={idx} className={`resume-single fade-up delay-${(idx % 3) + 1}`}>
-                      <div className="time">
-                        <span className="dot"></span>
-                        {proj.technologies || "Web Development"}
-                      </div>
-                      <h3 className="resume-title">{proj.title}</h3>
-                      <div className="institute">{proj.description}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="resume-widget">
-                  {projects.slice(Math.ceil(projects.length / 2)).map((proj: any, idx: number) => (
-                    <div key={idx} className={`resume-single fade-up delay-${(idx % 3) + 1}`}>
-                      <div className="time">
-                        <span className="dot"></span>
-                        {proj.technologies || "Web Development"}
-                      </div>
-                      <h3 className="resume-title">{proj.title}</h3>
-                      <div className="institute">{proj.description}</div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="resume-widget">
-                  <div className="resume-single fade-up delay-1">
-                    <div className="time"><span className="dot"></span> Full Stack</div>
-                    <h3 className="resume-title">Enterprise Dashboard Application (2024)</h3>
-                    <div className="institute">Membangun dashboard analitik real-time untuk perusahaan dengan Next.js, Supabase, dan Cloudflare Workers. Menghasilkan peningkatan efisiensi operasional 40%.</div>
-                  </div>
-                  <div className="resume-single fade-up delay-2">
-                    <div className="time"><span className="dot"></span> Cyber Security</div>
-                    <h3 className="resume-title">Web Application Penetration Testing</h3>
-                    <div className="institute">Melakukan security audit pada 5+ aplikasi web korporat. Menemukan dan melaporkan 15+ kerentanan kritis sebelum dieksploitasi.</div>
-                  </div>
-                </div>
-                <div className="resume-widget">
-                  <div className="resume-single fade-up delay-1">
-                    <div className="time"><span className="dot"></span> Cloud Architecture</div>
-                    <h3 className="resume-title">Multi-Cloud Deployment Infrastructure</h3>
-                    <div className="institute">Merancang arsitektur deployment multi-cloud (AWS + Cloudflare) dengan CI/CD pipeline otomatis, mengurangi downtime hingga 99.9% uptime.</div>
-                  </div>
-                  <div className="resume-single fade-up delay-2">
-                    <div className="time"><span className="dot"></span> API Development</div>
-                    <h3 className="resume-title">RESTful API Microservices Platform</h3>
-                    <div className="institute">Membangun platform API microservices yang melayani 100k+ request per hari dengan Node.js dan PostgreSQL.</div>
-                  </div>
-                </div>
-              </>
-            )}
+          <div>
+            <h3>Find Me</h3>
+            <a href={`mailto:${text(profile, ["email"], "tino@example.com")}`}>{text(profile, ["email"], "tino@example.com")}</a>
+            <span>{text(profile, ["phone"], "+62 800 0000 0000")}</span>
+            <span>{text(profile, ["location"], "Indonesia")}</span>
           </div>
         </div>
-      </section>
-
-      {/* ========================================
-          8. GALLERY SECTION
-          ======================================== */}
-      <section id="gallery" className="section-gap">
-        <div className="container">
-          <div className="text-center mb-60">
-            <div className="section-subtitle fade-up">Galeri Foto</div>
-            <h2 className="section-title fade-up delay-1">Kumpulan Foto & Kegiatan</h2>
-          </div>
-          <div className="gallery-grid">
-            {displayGallery.map((item: any, idx: number) => {
-              const imgUrl = typeof item === 'string' ? item :
-                (item.image_url?.startsWith('http') ? item.image_url : `https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=500&q=80`);
-              return (
-                <div key={idx} className={`gallery-item fade-up delay-${(idx % 3) + 1}`}>
-                  <Image src={imgUrl} alt={item.title || `Gallery ${idx + 1}`} width={500} height={500} unoptimized />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================
-          CTA SECTION
-          ======================================== */}
-      <section className="section-gap cta-section">
-        <div className="container">
-          <h2 className="section-title fade-up">Mari Terhubung dan Berkolaborasi! 🚀</h2>
-          <p className="section-description fade-up delay-1" style={{ margin: '0 auto 32px', textAlign: 'center' }}>
-            Apakah Anda memiliki proyek menarik atau butuh konsultasi IT? Jangan ragu untuk menghubungi saya.
-          </p>
-          <div className="fade-up delay-2" style={{ textAlign: 'center' }}>
-            <a href="https://wa.me/628000000000" target="_blank" rel="noopener" className="tmp-btn">
-              <FaWhatsapp style={{ fontSize: '18px' }} />
-              <span>Hubungi Saya</span>
-              <FaArrowRight className="icon-arrow" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================
-          FOOTER
-          ======================================== */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-grid">
-            <div className="footer-brand">
-              <Link href="#home" className="logo">{profile?.name?.split(' ')[0] || "Tino"}.</Link>
-              <p className="description">
-                Personal portfolio website. Dibangun dengan Next.js & Supabase. Cepat, ringan, aman, dan modern.
-              </p>
-            </div>
-            <div className="footer-col">
-              <h5 className="ft-title">Quick Link</h5>
-              <div className="ft-link">
-                <Link href="#home">Home</Link>
-                <Link href="#about">Tentang</Link>
-                <Link href="#services">Layanan</Link>
-                <Link href="#skills">Keahlian</Link>
-                <Link href="#portfolio">Portofolio</Link>
-              </div>
-            </div>
-            <div className="footer-col">
-              <h5 className="ft-title">Find Me</h5>
-              <div className="social-link" style={{ marginTop: '4px' }}>
-                {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
-                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
-                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
-              </div>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <div>&copy; {new Date().getFullYear()} {profile?.name || "Tino Lambut"}. All Rights Reserved.</div>
-            <div>Built with Next.js & Supabase</div>
-          </div>
-        </div>
+        <div className="footer-bottom">&copy; 2026 {name}. All Rights Reserved.</div>
       </footer>
     </main>
   );

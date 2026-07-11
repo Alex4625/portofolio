@@ -1,72 +1,99 @@
-import { getProfile } from "@/../lib/data";
+import { getSiteData, text } from "@/../lib/data";
+import { toPublicUrl } from "@/../lib/r2";
 import { updateProfileAction } from "./actions";
 
-const R2_URL = "https://pub-bb3ad634e09444a1b3bcbe6d9cdef19e.r2.dev";
+function fileHint(path?: string) {
+  if (!path) return null;
+  return <a href={toPublicUrl(path)} target="_blank" rel="noopener" className="text-sm text-[var(--accent-blue)]">File saat ini</a>;
+}
 
-export const dynamic = 'force-dynamic';
-
-export default async function AdminProfile() {
-  const profile = await getProfile();
+export default async function AdminDashboard() {
+  const data = await getSiteData();
+  const profile = data.profile;
+  const statsJson = JSON.stringify(profile?.stats_json || [], null, 2);
 
   return (
-    <div className="max-w-3xl space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold font-mono text-accent-blue">Profil_Utama</h1>
-        <p className="text-gray-400 mt-2">Perbarui informasi identitas yang tampil di halaman depan portofolio Anda.</p>
+    <div className="admin-page">
+      <div className="admin-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Kelola identitas utama, kontak, statistik, dan ringkasan konten public.</p>
+        </div>
+        <a href="/" target="_blank" rel="noopener" className="ghost-btn">Lihat Website</a>
       </div>
 
-      <form action={updateProfileAction} className="glass-panel p-8 space-y-6">
-        <input type="hidden" name="old_avatar" value={profile?.avatar_path || ""} />
-        <input type="hidden" name="old_cv" value={profile?.cv_pdf_path || ""} />
+      <section className="admin-grid">
+        {[
+          ["Services", data.services.length],
+          ["Skills", data.skills.length],
+          ["Projects", data.projects.length],
+          ["Media", data.videos.length + data.galleries.length],
+        ].map(([label, value]) => (
+          <div className="glass-panel admin-card admin-stat" key={label}>
+            <strong>{value}</strong>
+            <span>{label}</span>
+          </div>
+        ))}
+      </section>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono">Nama Lengkap</label>
-            <input type="text" name="name" defaultValue={profile?.name || ""} required className="w-full bg-[#0B0E14] border border-gray-700 rounded p-3 text-white focus:border-accent-blue focus:outline-none" />
+      <form action={updateProfileAction} className="glass-panel admin-card admin-form">
+        <div className="admin-header">
+          <div>
+            <h1>Profil & Kontak</h1>
+            <p>Data singleton yang dipakai hero, about, CTA, navbar, dan footer.</p>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono">Profesi (Pisahkan dengan koma)</label>
-            <input type="text" name="profession" defaultValue={profile?.profession || ""} required className="w-full bg-[#0B0E14] border border-gray-700 rounded p-3 text-white focus:border-accent-blue focus:outline-none" />
-          </div>
+          <button type="submit" className="primary-btn">Simpan Profil</button>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm text-gray-400 font-mono">Bio Singkat</label>
-          <textarea name="bio" defaultValue={profile?.bio || ""} required rows={4} className="w-full bg-[#0B0E14] border border-gray-700 rounded p-3 text-white focus:border-accent-blue focus:outline-none" />
-        </div>
+        {["avatar_path", "hero_image_path", "about_image_path", "cv_pdf_path"].map((key) => (
+          <input key={key} type="hidden" name={`old_${key}`} value={text(profile, [key])} />
+        ))}
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono">Email Utama</label>
-            <input type="email" name="email" defaultValue={profile?.email || ""} required className="w-full bg-[#0B0E14] border border-gray-700 rounded p-3 text-white focus:border-accent-blue focus:outline-none" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono">URL GitHub</label>
-            <input type="url" name="github_url" defaultValue={profile?.github_url || ""} className="w-full bg-[#0B0E14] border border-gray-700 rounded p-3 text-white focus:border-accent-blue focus:outline-none" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono">URL LinkedIn</label>
-            <input type="url" name="linkedin_url" defaultValue={profile?.linkedin_url || ""} className="w-full bg-[#0B0E14] border border-gray-700 rounded p-3 text-white focus:border-accent-blue focus:outline-none" />
-          </div>
-        </div>
+        <div className="admin-form-grid">
+          {[
+            ["name", "Nama"],
+            ["full_name", "Nama Lengkap"],
+            ["profession", "Profesi"],
+            ["hero_badge", "Badge Hero"],
+            ["email", "Email"],
+            ["phone", "Telepon"],
+            ["whatsapp_url", "WhatsApp URL"],
+            ["location", "Lokasi"],
+            ["github_url", "GitHub URL"],
+            ["linkedin_url", "LinkedIn URL"],
+            ["instagram_url", "Instagram URL"],
+          ].map(([name, label]) => (
+            <label className="field" key={name}>
+              <span>{label}</span>
+              <input name={name} defaultValue={text(profile, [name])} />
+            </label>
+          ))}
 
-        <div className="border-t border-gray-800 pt-6 grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono block">Foto Profil Baru (Biarkan kosong jika tidak diubah)</label>
-            <input type="file" name="avatar" accept="image/*" className="w-full bg-[#0B0E14] border border-gray-700 rounded p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-800 file:text-white hover:file:bg-gray-700" />
-            {profile?.avatar_path && <p className="text-xs text-accent-blue mt-1">Saat ini: {profile.avatar_path}</p>}
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm text-gray-400 font-mono block">File CV Baru (PDF)</label>
-            <input type="file" name="cv" accept=".pdf" className="w-full bg-[#0B0E14] border border-gray-700 rounded p-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-800 file:text-white hover:file:bg-gray-700" />
-            {profile?.cv_pdf_path && <p className="text-xs text-accent-blue mt-1">Saat ini: {profile.cv_pdf_path}</p>}
-          </div>
-        </div>
+          <label className="field full">
+            <span>Bio Singkat</span>
+            <textarea name="bio" defaultValue={text(profile, ["bio"])} />
+          </label>
+          <label className="field full">
+            <span>About Text</span>
+            <textarea name="about_text" defaultValue={text(profile, ["about_text"])} />
+          </label>
+          <label className="field full">
+            <span>Stats JSON</span>
+            <textarea name="stats_json" defaultValue={statsJson} />
+          </label>
 
-        <div className="pt-6 text-right">
-          <button type="submit" className="bg-accent-blue text-black font-bold py-3 px-8 rounded hover:bg-white transition-colors">
-            Simpan Perubahan
-          </button>
+          {[
+            ["avatar_path", "Avatar"],
+            ["hero_image_path", "Hero Image"],
+            ["about_image_path", "About Image"],
+            ["cv_pdf_path", "CV PDF"],
+          ].map(([name, label]) => (
+            <label className="field" key={name}>
+              <span>{label}</span>
+              <input name={name} type="file" accept={name === "cv_pdf_path" ? ".pdf" : "image/*"} />
+              {fileHint(text(profile, [name]))}
+            </label>
+          ))}
         </div>
       </form>
     </div>

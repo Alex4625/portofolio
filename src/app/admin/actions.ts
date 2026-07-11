@@ -1,9 +1,49 @@
 "use server";
 
-import { login, logout } from "@/../lib/auth";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { login, logout, assertAdminAction } from "@/../lib/auth";
 import { supabase } from "@/../lib/db";
 import { uploadToR2, deleteFromR2 } from "@/../lib/r2";
-import { revalidatePath } from "next/cache";
+import { resourceConfigs, type FieldKind, type ResourceConfig } from "@/../lib/adminResources";
+
+function getConfig(resource: string) {
+  const config = resourceConfigs[resource];
+  if (!config) throw new Error("Resource tidak dikenal");
+  return config;
+}
+
+function getString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function parseField(formData: FormData, key: string, kind: FieldKind) {
+  if (kind === "checkbox") return formData.get(key) === "on" || formData.get(key) === "true";
+  if (kind === "number") {
+    const value = getString(formData, key);
+    return value ? Number(value) : 0;
+  }
+  if (kind === "json") {
+    const value = getString(formData, key);
+    if (!value) return [];
+    return value.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+  return getString(formData, key) || null;
+}
+
+async function applyUploads(config: ResourceConfig, formData: FormData, payload: Record<string, unknown>) {
+  for (const [column, folder] of Object.entries(config.files)) {
+    const file = formData.get(column) as File | null;
+    const oldPath = getString(formData, `old_${column}`);
+    payload[column] = oldPath || null;
+
+    if (file && file.size > 0) {
+      if (oldPath) await deleteFromR2(oldPath);
+      payload[column] = await uploadToR2(file, folder);
+    }
+  }
+}
 
 export async function loginAction(password: string) {
   return await login(password);
@@ -11,80 +51,108 @@ export async function loginAction(password: string) {
 
 export async function logoutAction() {
   await logout();
+  redirect("/admin/login");
 }
 
-// PROFILE ACTIONS
 export async function updateProfileAction(formData: FormData): Promise<void> {
-  const name = formData.get("name") as string;
-  const profession = formData.get("profession") as string;
-  const bio = formData.get("bio") as string;
-  const email = formData.get("email") as string;
-  const github_url = formData.get("github_url") as string;
-  const linkedin_url = formData.get("linkedin_url") as string;
-  
-  const avatarFile = formData.get("avatar") as File;
-  const cvFile = formData.get("cv") as File;
-  const oldAvatar = formData.get("old_avatar") as string;
-  const oldCv = formData.get("old_cv") as string;
+  await assertAdminAction();
 
-  let avatarPath = oldAvatar;
-  let cvPath = oldCv;
+  const fields = [
+    "name",
+    "full_name",
+    "profession",
+    "hero_badge",
+    "bio",
+    "about_text",
+    "email",
+    "phone",
+    "whatsapp_url",
+    "location",
+    "github_url",
+    "linkedin_url",
+    "instagram_url",
+  ];
 
-  if (avatarFile && avatarFile.size > 0) {
-    if (oldAvatar) await deleteFromR2(oldAvatar);
-    avatarPath = await uploadToR2(avatarFile, "profiles");
+  const payload: Record<string, unknown> = {};
+  for (const field of fields) payload[field] = getString(formData, field) || null;
+
+  const statsText = getString(formData, "stats_json");
+  if (statsText) {
+    try {
+      payload.stats_json = JSON.parse(statsText);
+    } catch {
+      payload.stats_json = [];
+    }
   }
 
-  if (cvFile && cvFile.size > 0) {
-    if (oldCv) await deleteFromR2(oldCv);
-    cvPath = await uploadToR2(cvFile, "profiles");
+  for (const [column, folder] of Object.entries({
+    avatar_path: "profiles",
+    hero_image_path: "profiles",
+    about_image_path: "profiles",
+    cv_pdf_path: "profiles",
+  })) {
+    const file = formData.get(column) as File | null;
+    const oldPath = getString(formData, `old_${column}`);
+    payload[column] = oldPath || null;
+    if (file && file.size > 0) {
+      if (oldPath) await deleteFromR2(oldPath);
+      payload[column] = await uploadToR2(file, folder);
+    }
   }
 
-  const { data: existingProfile } = await supabase.from('profiles').select('id').limit(1).single();
+  payload.updated_at = new Date().toISOString();
+
+  const { data: existingProfile } = await supabase.from("profiles").select("id").limit(1).single();
 
   if (existingProfile) {
-    await supabase.from('profiles').update({
-      name, profession, bio, email, github_url, linkedin_url,
-      avatar_path: avatarPath, cv_pdf_path: cvPath, updated_at: new Date().toISOString()
-    }).eq('id', existingProfile.id);
+    await supabase.from("profiles").update(payload).eq("id", existingProfile.id);
   } else {
-    await supabase.from('profiles').insert({
-      name, profession, bio, email, github_url, linkedin_url,
-      avatar_path: avatarPath, cv_pdf_path: cvPath
-    });
+    await supabase.from("profiles").insert(payload);
   }
 
   revalidatePath("/");
   revalidatePath("/admin");
 }
 
-// PROJECT ACTIONS
-export async function createProjectAction(formData: FormData): Promise<void> {
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const technologies = formData.get("technologies") as string;
-  const url = formData.get("url") as string;
-  const is_published = formData.get("is_published") === "true";
-  
-  const imageFile = formData.get("image") as File;
-  let imagePath = "";
+export async function upsertResourceAction(resource: string, formData: FormData): Promise<void> {
+  await assertAdminAction();
+  const config = getConfig(resource);
+  const id = getString(formData, "id");
+  const payload: Record<string, unknown> = {};
 
-  if (imageFile && imageFile.size > 0) {
-    imagePath = await uploadToR2(imageFile, "projects");
+  for (const [key, kind] of Object.entries(config.fields)) {
+    payload[key] = parseField(formData, key, kind);
+  }
+  await applyUploads(config, formData, payload);
+  payload.updated_at = new Date().toISOString();
+
+  if (id) {
+    await supabase.from(config.table).update(payload).eq("id", id);
+  } else {
+    await supabase.from(config.table).insert(payload);
   }
 
-  await supabase.from('projects').insert({
-    title, description, technologies, url, image_path: imagePath, is_published
-  });
-
   revalidatePath("/");
-  revalidatePath("/admin/projects");
+  revalidatePath(config.path);
+  revalidatePath("/admin");
+}
+
+export async function deleteResourceAction(resource: string, id: string, filePaths: string[] = []): Promise<void> {
+  await assertAdminAction();
+  const config = getConfig(resource);
+  for (const filePath of filePaths) {
+    if (filePath) await deleteFromR2(filePath);
+  }
+  await supabase.from(config.table).delete().eq("id", id);
+  revalidatePath("/");
+  revalidatePath(config.path);
+  revalidatePath("/admin");
+}
+
+export async function createProjectAction(formData: FormData): Promise<void> {
+  return upsertResourceAction("projects", formData);
 }
 
 export async function deleteProjectAction(id: string, imagePath?: string): Promise<void> {
-  if (imagePath) await deleteFromR2(imagePath);
-  await supabase.from('projects').delete().eq('id', id);
-  
-  revalidatePath("/");
-  revalidatePath("/admin/projects");
+  return deleteResourceAction("projects", id, imagePath ? [imagePath] : []);
 }

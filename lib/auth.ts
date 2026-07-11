@@ -1,11 +1,11 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 const secretKey = process.env.ADMIN_PASSWORD || "default-secret-password-change-me";
 const key = new TextEncoder().encode(secretKey);
 
-export async function encrypt(payload: any) {
+export async function encrypt(payload: Record<string, unknown>) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -13,7 +13,7 @@ export async function encrypt(payload: any) {
     .sign(key);
 }
 
-export async function decrypt(input: string): Promise<any> {
+export async function decrypt(input: string): Promise<Record<string, unknown>> {
   const { payload } = await jwtVerify(input, key, {
     algorithms: ["HS256"],
   });
@@ -49,7 +49,23 @@ export async function getSession() {
   if (!session) return null;
   try {
     return await decrypt(session);
-  } catch (error) {
+  } catch {
     return null;
   }
+}
+
+export async function requireAdmin() {
+  const session = await getSession();
+  if (!session) {
+    redirect("/admin/login");
+  }
+  return session;
+}
+
+export async function assertAdminAction() {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  return session;
 }
