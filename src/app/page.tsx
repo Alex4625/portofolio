@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp, FaArrowRight, FaDesktop, FaUsers, FaChartLine, FaCheckCircle, FaChevronRight } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaInstagram, FaWhatsapp, FaArrowRight, FaDesktop, FaChartLine, FaChartPie, FaBullhorn, FaUserTie, FaUsersViewfinder, FaMicrophone } from "react-icons/fa6";
 import { getProfile, getProjects, getSkills, getExperiences, getServices, getCertifications, getGallery } from "@/../lib/data";
 import Navbar from "@/components/Navbar";
 import ScrollObserver from "@/components/ScrollObserver";
@@ -11,162 +11,243 @@ export default async function Home() {
   const profile = await getProfile() || {
     name: "Tino Lambut",
     profession: "Full Stack Developer",
-    bio: "Saya adalah seorang Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif.",
+    bio: "Saya adalah seorang Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif. Dengan latar belakang pendidikan di bidang Teknologi Informasi, saya memiliki keahlian dalam pengembangan Front-End maupun Back-End menggunakan teknologi terkini.",
     email: "tino@example.com",
-    avatar_path: "https://files.ituaku.site/assets/sites/content/6e13472f1c4b43c3a7a9646e141db7bbe8fad1ebc90a00f962478faa050c218d.webp"
+    github_url: "https://github.com",
+    linkedin_url: "https://linkedin.com",
+    instagram_url: "https://instagram.com",
+    avatar_path: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
   };
+
   const projects = await getProjects();
   const skills = await getSkills();
   const experiences = await getExperiences();
-  
-  // New tables for full redesign matching napa.ituaku.com (using fallbacks if empty to show the layout)
   const services = await getServices();
   const certifications = await getCertifications();
   const gallery = await getGallery();
 
-  const dummyServices = [
-    { order_num: 1, title: "Web Development", description: "(Frontend, Backend, Fullstack, API)" },
-    { order_num: 2, title: "Cyber Security & Pentesting", description: "(Vulnerability Assessment, Web Security)" },
-    { order_num: 3, title: "Cloud Architecture", description: "(AWS, Cloudflare, Deployment, CI/CD)" },
-    { order_num: 4, title: "Database Management", description: "(PostgreSQL, Supabase, MySQL)" }
+  // Fallback data saat database kosong
+  const fallbackHighlights = [
+    { icon: "chart-line", title: "10+ Proyek Web Terselesaikan dengan Teknologi Modern", desc: "Menggunakan Next.js, React, Node.js dan infrastruktur cloud modern untuk membangun aplikasi skala enterprise." },
+    { icon: "chart-pie", title: "Optimasi Performa & Keamanan pada Setiap Proyek", desc: "Implementasi best practices keamanan web, penetration testing, dan optimalisasi performa aplikasi." },
+    { icon: "bullhorn", title: "Full Stack Development dari Konsep hingga Deployment", desc: "Membangun solusi end-to-end mulai dari desain database, backend API, frontend UI, hingga deployment di cloud." },
   ];
 
-  const dummyCerts = [
-    { year: 2024, organization: "CompTIA", title: "CompTIA Security+ Certification" },
-    { year: 2023, organization: "AWS", title: "AWS Certified Developer – Associate" },
-    { year: 2022, organization: "Google", title: "Google IT Support Professional Certificate" }
+  const fallbackServices = [
+    { order_num: 1, title: "Full Stack Web Development", description: "(Next.js, React, Node.js, Laravel)" },
+    { order_num: 2, title: "Cyber Security & Penetration Testing", description: "(Web Security, Vulnerability Assessment)" },
+    { order_num: 3, title: "Cloud Architecture & DevOps", description: "(AWS, Cloudflare, CI/CD Pipeline)" },
+    { order_num: 4, title: "Database Design & Management", description: "(PostgreSQL, Supabase, MySQL, MongoDB)" },
+    { order_num: 5, title: "API Development & Integration", description: "(RESTful API, GraphQL, Third-party APIs)" },
   ];
 
-  const displayServices = services.length > 0 ? services : dummyServices;
-  const displayCerts = certifications.length > 0 ? certifications : dummyCerts;
-  const avatarUrl = profile?.avatar_path?.startsWith('http') ? profile.avatar_path : (profile?.avatar_path ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/portofolio/${profile.avatar_path}` : "https://files.ituaku.site/assets/sites/content/6e13472f1c4b43c3a7a9646e141db7bbe8fad1ebc90a00f962478faa050c218d.webp");
+  const fallbackSkills = [
+    { name: "Next.js & React", value: "Expert" },
+    { name: "Node.js & Express", value: "Advanced" },
+    { name: "Cyber Security & Pentesting", value: "Advanced" },
+    { name: "TypeScript & JavaScript", value: "Expert" },
+    { name: "Cloud & DevOps (AWS, CF)", value: "Advanced" },
+    { name: "Database (PostgreSQL, MySQL)", value: "Advanced" },
+  ];
+
+  const fallbackExperiences = [
+    { sub: "Full Stack Developer", title: "Tech Company | 2023 - Sekarang", desc: "Membangun dan mengelola aplikasi web skala enterprise menggunakan Next.js, React, dan Node.js. Bertanggung jawab atas arsitektur frontend-backend dan deployment cloud." },
+    { sub: "Freelance Web Developer", title: "Self-Employed | 2021 - 2023", desc: "Mengerjakan berbagai proyek klien dari landing page, e-commerce, hingga sistem manajemen internal menggunakan teknologi modern." },
+    { sub: "IT Security Analyst", title: "Cyber Security Firm | 2022", desc: "Melakukan vulnerability assessment dan penetration testing pada aplikasi web klien korporat. Menyusun laporan keamanan dan rekomendasi perbaikan." },
+    { sub: "Junior Developer", title: "Software House | 2020 - 2021", desc: "Mengembangkan fitur-fitur pada aplikasi web menggunakan Laravel dan Vue.js. Berkolaborasi dalam tim agile untuk delivery proyek tepat waktu." },
+  ];
+
+  const fallbackCerts = [
+    { org: "CompTIA", name: "CompTIA Security+ Certification", year: "2024" },
+    { org: "AWS", name: "AWS Certified Developer – Associate", year: "2023" },
+    { org: "Google", name: "Google IT Support Professional Certificate", year: "2023" },
+    { org: "Meta", name: "Meta Front-End Developer Professional Certificate", year: "2022" },
+    { org: "Coursera", name: "Full Stack Web Development Specialization", year: "2021" },
+  ];
+
+  const fallbackGallery = [
+    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=500&q=80",
+    "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=500&q=80",
+    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=500&q=80",
+    "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=500&q=80",
+    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=500&q=80",
+    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=500&q=80",
+  ];
+
+  const displayServices = services.length > 0 ? services : fallbackServices;
+  const displayCerts = certifications.length > 0 ? certifications : fallbackCerts;
+  const displayGallery = gallery.length > 0 ? gallery : fallbackGallery.map((url, i) => ({ image_url: url, title: `Gallery ${i+1}` }));
+
+  const avatarUrl = profile?.avatar_path?.startsWith('http')
+    ? profile.avatar_path
+    : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
+
+  const servicesImageUrl = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80";
+  const certsImageUrl = "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80";
 
   return (
     <main>
       <ScrollObserver />
       <Navbar profile={profile} />
 
-      {/* 1. HERO SECTION */}
-      <section id="home" className="hero">
-        <div className="hero-bg-text">{profile?.profession || 'Developer'}</div>
-        <div className="section-container">
-          <div className="hero-content">
-            <div className="hero-info">
-              <span className="hero-greeting fade-in">Hello saya</span>
-              <h1 className="hero-name fade-in fade-in-delay-1">{profile?.name}</h1>
-              <div className="hero-actions fade-in fade-in-delay-2">
-                <Link href="#about" className="btn-primary">
-                  Tentang Saya <FaArrowRight />
-                </Link>
+      {/* ========================================
+          1. HERO BANNER
+          ======================================== */}
+      <section id="home" className="banner">
+        <div className="container">
+          <div className="banner-wrapper">
+            <div className="banner-row">
+              {/* Left Column: Name + CTA */}
+              <div className="banner-left">
+                <span className="sub-title fade-up delay-1">Hello saya</span>
+                <h1 className="title fade-up delay-2">{profile?.name}</h1>
+                <div className="fade-up delay-3">
+                  <Link href="#about" className="tmp-btn">
+                    <span>Tentang Saya</span>
+                    <FaArrowRight className="icon-arrow" />
+                  </Link>
+                </div>
               </div>
-              <div className="hero-social fade-in fade-in-delay-3">
-                {profile?.github_url && <a href={profile.github_url} target="_blank"><FaGithub /></a>}
-                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank"><FaLinkedin /></a>}
-                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank"><FaInstagram /></a>}
+
+              {/* Right Column: About + Social */}
+              <div className="banner-right">
+                <div className="about-me fade-up delay-1">
+                  <h3 className="title">About Me</h3>
+                  <p className="para">{profile?.bio}</p>
+                </div>
+                <div className="find-me-on fade-up delay-2">
+                  <h2 className="find-me-on-title">Find me on</h2>
+                  <div className="social-link banner">
+                    {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
+                    {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
+                    {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="hero-image-wrapper fade-in fade-in-delay-1">
-              <div className="hero-image-ring"></div>
-              <div className="hero-image-frame">
-                <Image src={avatarUrl} alt={profile?.name || "Profile"} width={400} height={500} unoptimized />
-              </div>
+
+            {/* Center Profile Image */}
+            <div className="banner-bg-img zoom-in delay-2">
+              <Image src={avatarUrl} alt={profile?.name || "Profile"} width={500} height={650} unoptimized priority />
             </div>
+
+            {/* Background Text */}
+            <div className="banner-bg-text">{profile?.profession || "Developer"}</div>
           </div>
         </div>
       </section>
 
-      {/* 2. ABOUT SECTION */}
-      <section id="about" className="section bg-white/5">
-        <div className="section-container">
+      {/* ========================================
+          STAT HIGHLIGHT CARDS (below hero)
+          ======================================== */}
+      <section className="section-gap-top">
+        <div className="container">
+          <div className="service-cards-row">
+            {fallbackHighlights.map((item, idx) => (
+              <div key={idx} className={`service-card-v1 fade-up delay-${idx + 1}`}>
+                <div className="icon">
+                  {idx === 0 && <FaChartLine />}
+                  {idx === 1 && <FaChartPie />}
+                  {idx === 2 && <FaBullhorn />}
+                </div>
+                <h4 className="card-title">{item.title}</h4>
+                <p className="card-para">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================
+          2. ABOUT SECTION
+          ======================================== */}
+      <section id="about" className="section-gap">
+        <div className="container">
           <div className="about-grid">
             <div className="about-left">
-              <div className="stat-card fade-in">
-                <div className="stat-number">5+</div>
-                <div className="stat-label">Years of Experience</div>
+              <div className="years-card fade-up delay-1">
+                <div className="number">5+</div>
+                <div className="label">years of experience</div>
               </div>
-              <div className="stat-card fade-in fade-in-delay-1">
-                <div style={{fontSize: '2rem', color: 'var(--cream)', marginBottom: '8px'}}><FaDesktop /></div>
-                <div className="stat-label">Projects Completed</div>
-                <div className="stat-number" style={{fontSize: '2rem', marginTop: '10px'}}>{projects.length || 15}+</div>
+              <div className="info-card fade-up delay-2">
+                <div className="icon-box"><FaDesktop /></div>
+                <div className="card-info">
+                  <div className="card-title">Projects Completed</div>
+                  <div className="card-para">{projects.length > 0 ? `${projects.length}+` : "15+"}</div>
+                </div>
               </div>
             </div>
             <div className="about-right">
-              <div className="section-header" style={{marginBottom: '24px'}}>
-                <span className="section-subtitle fade-in">About Me</span>
-                <h2 className="section-title fade-in fade-in-delay-1">
-                  {profile?.profession} | <span>Tech Enthusiast</span>
-                </h2>
-              </div>
-              <p className="about-description fade-in fade-in-delay-2">
-                {profile?.bio}
-              </p>
+              <div className="section-subtitle fade-up">About Me</div>
+              <h2 className="section-title fade-up delay-1">
+                {profile?.profession || "Full Stack Developer"} | Tech Enthusiast & Problem Solver
+              </h2>
+              <p className="section-description fade-up delay-2">{profile?.bio}</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. SERVICES SECTION */}
-      <section id="services" className="section">
-        <div className="section-container">
-          <div className="section-header text-center">
-            <span className="section-subtitle fade-in">Layanan Tersedia</span>
-            <h2 className="section-title fade-in fade-in-delay-1">
-              Saya terbuka untuk kolaborasi, freelance project, <br/>maupun kerjasama profesional
+      {/* ========================================
+          3. SERVICES SECTION
+          ======================================== */}
+      <section id="services" className="section-gap">
+        <div className="container">
+          <div className="text-center mb-60">
+            <div className="section-subtitle fade-up">Layanan Tersedia</div>
+            <h2 className="section-title fade-up delay-1">
+              Saya terbuka untuk kolaborasi, freelance project,<br />maupun kerjasama profesional di bidang
             </h2>
           </div>
-          <div className="services-grid">
-            <div className="services-list">
+          <div className="services-layout">
+            <div>
               {displayServices.map((svc: any, idx: number) => (
-                <div key={idx} className={`service-item fade-in fade-in-delay-${idx % 4}`}>
-                  <div className="d-flex align-items-center">
-                    <span className="service-num">{svc.order_num}.</span>
-                    <span className="service-name">{svc.title}</span>
+                <div key={idx} className={`service-list-item fade-up delay-${(idx % 5) + 1}`}>
+                  <div>
+                    <span className="num">{svc.order_num || idx + 1}.</span>
+                    <span className="name">{svc.title}</span>
                   </div>
-                  {svc.description && <p className="service-desc">{svc.description}</p>}
+                  {svc.description && <p className="desc">{svc.description}</p>}
                 </div>
               ))}
             </div>
-            <div className="services-image fade-in fade-in-delay-1">
-              <Image src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" alt="Services" width={600} height={500} unoptimized className="rounded-xl" />
+            <div className="services-image zoom-in delay-1">
+              <Image src={servicesImageUrl} alt="Services" width={600} height={700} unoptimized />
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. SKILLS SECTION */}
-      <section id="skills" className="section bg-white/5">
-        <div className="section-container">
+      {/* ========================================
+          4. SKILLS / EXPERTISE SECTION
+          ======================================== */}
+      <section id="skills" className="section-gap">
+        <div className="container">
           <div className="skills-grid">
-            <div className="skills-col">
-              <h3 className="skill-group-title fade-in">Keahlian Utama</h3>
-              {skills.slice(0, Math.ceil(skills.length / 2) || 3).map((skill: any, idx: number) => (
-                <div key={idx} className="skill-item fade-in">
-                  <div className="skill-header">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-value">{skill.percentage || 90}%</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div className="skill-fill" style={{width: `${skill.percentage || 90}%`}}></div>
+            <div>
+              <h2 className="custom-title fade-up">
+                Keahlian Utama <span className="line"></span>
+              </h2>
+              {(skills.length > 0 ? skills.slice(0, Math.ceil(skills.length / 2)) : fallbackSkills.slice(0, 3)).map((s: any, idx: number) => (
+                <div key={idx} className="progress-charts fade-up">
+                  <h6 className="heading">{s.name}</h6>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${s.percentage || 100}%` }}>
+                      <span className="label">{s.value || s.percentage ? `${s.percentage}%` : "Expert"}</span>
+                    </div>
                   </div>
                 </div>
               ))}
-              {skills.length === 0 && (
-                <div className="skill-item fade-in">
-                  <div className="skill-header"><span className="skill-name">Next.js & React</span><span className="skill-value">95%</span></div>
-                  <div className="skill-bar"><div className="skill-fill" style={{width: '95%'}}></div></div>
-                </div>
-              )}
             </div>
-            <div className="skills-col">
-              <h3 className="skill-group-title fade-in">&nbsp;</h3>
-              {skills.slice(Math.ceil(skills.length / 2) || 3).map((skill: any, idx: number) => (
-                <div key={idx} className="skill-item fade-in">
-                  <div className="skill-header">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-value">{skill.percentage || 85}%</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div className="skill-fill" style={{width: `${skill.percentage || 85}%`}}></div>
+            <div>
+              <h2 className="custom-title fade-up">&nbsp;<span className="line"></span></h2>
+              {(skills.length > 0 ? skills.slice(Math.ceil(skills.length / 2)) : fallbackSkills.slice(3)).map((s: any, idx: number) => (
+                <div key={idx} className="progress-charts fade-up">
+                  <h6 className="heading">{s.name}</h6>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${s.percentage || 100}%` }}>
+                      <span className="label">{s.value || s.percentage ? `${s.percentage}%` : "Advanced"}</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -175,156 +256,204 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. EXPERIENCE SECTION */}
-      <section id="experience" className="section">
-        <div className="section-container">
-          <h2 className="skill-group-title fade-in" style={{marginBottom: '40px'}}>Pengalaman Utama</h2>
+      {/* ========================================
+          5. EXPERIENCE SECTION
+          ======================================== */}
+      <section id="experience" className="section-gap">
+        <div className="container">
+          <h2 className="custom-title mb-32 fade-up">
+            Pengalaman Utama <span className="line"></span>
+          </h2>
           <div className="experience-grid">
-            {experiences.map((exp: any, idx: number) => (
-              <div key={idx} className={`experience-card fade-in fade-in-delay-${idx % 4}`}>
-                <div className="exp-role">{exp.company} | {new Date(exp.start_date).getFullYear()}</div>
-                <h3 className="exp-title">{exp.title}</h3>
-                <p className="exp-description">{exp.description}</p>
-              </div>
-            ))}
-            {experiences.length === 0 && (
-              <>
-                <div className="experience-card fade-in">
-                  <div className="exp-role">Tech Company | 2023 - Present</div>
-                  <h3 className="exp-title">Senior Full Stack Developer</h3>
-                  <p className="exp-description">Membangun aplikasi web skala enterprise menggunakan Next.js dan Supabase. Mengoptimalkan performa dan keamanan sistem.</p>
-                </div>
-                <div className="experience-card fade-in fade-in-delay-1">
-                  <div className="exp-role">Freelance | 2021 - 2023</div>
-                  <h3 className="exp-title">Web Developer</h3>
-                  <p className="exp-description">Mengerjakan berbagai proyek klien dari e-commerce hingga sistem manajemen internal menggunakan stack modern.</p>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. CERTIFICATIONS SECTION */}
-      <section id="certifications" className="section bg-white/5">
-        <div className="section-container">
-          <div className="certs-layout">
-            <div className="cert-image fade-in">
-              <Image src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" alt="Certifications" width={600} height={500} unoptimized className="rounded-xl" />
-            </div>
-            <div className="cert-content">
-              <h2 className="skill-group-title fade-in" style={{marginBottom: '32px'}}>Sertifikasi & Penghargaan</h2>
-              <div className="cert-list">
-                {displayCerts.map((cert: any, idx: number) => (
-                  <div key={idx} className="cert-item fade-in">
-                    <div className="cert-org">{cert.organization}</div>
-                    <h3 className="cert-name">{cert.title}</h3>
-                    <div className="cert-year">{cert.year}</div>
+            {experiences.length > 0
+              ? experiences.map((exp: any, idx: number) => (
+                  <div key={idx} className={`experience-card fade-up delay-${(idx % 4) + 1}`}>
+                    <h4 className="exp-sub-title">{exp.title || exp.role}</h4>
+                    <h2 className="exp-title">{exp.company} | {exp.start_date ? new Date(exp.start_date).getFullYear() : ""}</h2>
+                    <p className="exp-para">{exp.description}</p>
                   </div>
-                ))}
-              </div>
+                ))
+              : fallbackExperiences.map((exp, idx) => (
+                  <div key={idx} className={`experience-card fade-up delay-${(idx % 4) + 1}`}>
+                    <h4 className="exp-sub-title">{exp.sub}</h4>
+                    <h2 className="exp-title">{exp.title}</h2>
+                    <p className="exp-para">{exp.desc}</p>
+                  </div>
+                ))
+            }
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================
+          6. CERTIFICATIONS / AWARDS SECTION
+          ======================================== */}
+      <section id="certifications" className="section-gap">
+        <div className="container">
+          <div className="certs-layout">
+            <div className="cert-image zoom-in delay-1">
+              <Image src={certsImageUrl} alt="Certifications" width={600} height={500} unoptimized />
+            </div>
+            <div>
+              <h2 className="custom-title mb-32 fade-up">
+                Sertifikasi & Penghargaan <span className="line"></span>
+              </h2>
+              {displayCerts.map((cert: any, idx: number) => (
+                <div key={idx} className={`cert-item fade-up delay-${(idx % 5) + 1}`}>
+                  <div className="cert-org">{cert.org || cert.organization}</div>
+                  <h3 className="cert-name">{cert.name || cert.title}</h3>
+                  <div className="cert-year">{cert.year}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 7. PORTFOLIO SECTION */}
-      <section id="portfolio" className="section">
-        <div className="section-container">
-          <div className="section-header fade-in">
-            <h2 className="section-title"><FaDesktop className="inline text-cream mr-3" /> Portofolio / Projects</h2>
+      {/* ========================================
+          7. PORTFOLIO / PROJECTS SECTION
+          ======================================== */}
+      <section id="portfolio" className="section-gap">
+        <div className="container">
+          <div className="portfolio-header fade-up">
+            <h2 className="portfolio-title-main">
+              <FaMicrophone /> Portofolio / Projects
+            </h2>
           </div>
           <div className="portfolio-grid">
-            {projects.map((proj: any, idx: number) => (
-              <div key={idx} className={`portfolio-card fade-in fade-in-delay-${idx % 2}`}>
-                <div className="portfolio-category">{proj.is_published ? 'Published' : 'In Development'}</div>
-                <h3 className="portfolio-title">{proj.title}</h3>
-                <p className="portfolio-desc mb-4">{proj.description}</p>
-                <div className="text-sm font-mono text-gray-400 mb-4">{proj.technologies}</div>
-                {proj.url && (
-                  <a href={proj.url} target="_blank" className="text-cream font-semibold hover:text-white flex items-center gap-2">
-                    View Project <FaChevronRight className="text-xs" />
-                  </a>
-                )}
-              </div>
-            ))}
-            {projects.length === 0 && (
-              <div className="portfolio-card fade-in">
-                <div className="portfolio-category">Web App</div>
-                <h3 className="portfolio-title">Sistem Manajemen Kampus</h3>
-                <p className="portfolio-desc">Aplikasi berbasis web untuk manajemen data mahasiswa dan dosen.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* 8. GALLERY SECTION */}
-      <section id="gallery" className="section bg-white/5">
-        <div className="section-container">
-          <div className="section-header text-center fade-in">
-            <span className="section-subtitle">Galeri Foto</span>
-            <h2 className="section-title">Kumpulan Foto & Kegiatan</h2>
-          </div>
-          <div className="gallery-grid">
-            {gallery.map((item: any, idx: number) => (
-              <div key={idx} className={`gallery-item fade-in fade-in-delay-${idx % 3}`}>
-                <Image src={item.image_url.startsWith('http') ? item.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/portofolio/${item.image_url}`} alt={item.title || "Gallery"} width={400} height={400} unoptimized />
-              </div>
-            ))}
-            {gallery.length === 0 && (
+            {projects.length > 0 ? (
               <>
-                <div className="gallery-item fade-in"><Image src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=400&q=80" alt="Gal" width={400} height={400} unoptimized /></div>
-                <div className="gallery-item fade-in fade-in-delay-1"><Image src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80" alt="Gal" width={400} height={400} unoptimized /></div>
-                <div className="gallery-item fade-in fade-in-delay-2"><Image src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=400&q=80" alt="Gal" width={400} height={400} unoptimized /></div>
+                <div className="resume-widget">
+                  {projects.slice(0, Math.ceil(projects.length / 2)).map((proj: any, idx: number) => (
+                    <div key={idx} className={`resume-single fade-up delay-${(idx % 3) + 1}`}>
+                      <div className="time">
+                        <span className="dot"></span>
+                        {proj.technologies || "Web Development"}
+                      </div>
+                      <h3 className="resume-title">{proj.title}</h3>
+                      <div className="institute">{proj.description}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="resume-widget">
+                  {projects.slice(Math.ceil(projects.length / 2)).map((proj: any, idx: number) => (
+                    <div key={idx} className={`resume-single fade-up delay-${(idx % 3) + 1}`}>
+                      <div className="time">
+                        <span className="dot"></span>
+                        {proj.technologies || "Web Development"}
+                      </div>
+                      <h3 className="resume-title">{proj.title}</h3>
+                      <div className="institute">{proj.description}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="resume-widget">
+                  <div className="resume-single fade-up delay-1">
+                    <div className="time"><span className="dot"></span> Full Stack</div>
+                    <h3 className="resume-title">Enterprise Dashboard Application (2024)</h3>
+                    <div className="institute">Membangun dashboard analitik real-time untuk perusahaan dengan Next.js, Supabase, dan Cloudflare Workers. Menghasilkan peningkatan efisiensi operasional 40%.</div>
+                  </div>
+                  <div className="resume-single fade-up delay-2">
+                    <div className="time"><span className="dot"></span> Cyber Security</div>
+                    <h3 className="resume-title">Web Application Penetration Testing</h3>
+                    <div className="institute">Melakukan security audit pada 5+ aplikasi web korporat. Menemukan dan melaporkan 15+ kerentanan kritis sebelum dieksploitasi.</div>
+                  </div>
+                </div>
+                <div className="resume-widget">
+                  <div className="resume-single fade-up delay-1">
+                    <div className="time"><span className="dot"></span> Cloud Architecture</div>
+                    <h3 className="resume-title">Multi-Cloud Deployment Infrastructure</h3>
+                    <div className="institute">Merancang arsitektur deployment multi-cloud (AWS + Cloudflare) dengan CI/CD pipeline otomatis, mengurangi downtime hingga 99.9% uptime.</div>
+                  </div>
+                  <div className="resume-single fade-up delay-2">
+                    <div className="time"><span className="dot"></span> API Development</div>
+                    <h3 className="resume-title">RESTful API Microservices Platform</h3>
+                    <div className="institute">Membangun platform API microservices yang melayani 100k+ request per hari dengan Node.js dan PostgreSQL.</div>
+                  </div>
+                </div>
               </>
             )}
           </div>
         </div>
       </section>
 
-      {/* CTA SECTION */}
-      <section className="cta-section section">
-        <div className="section-container">
-          <h2 className="fade-in">Mari Terhubung dan Berkolaborasi!</h2>
-          <p className="fade-in fade-in-delay-1">Apakah Anda memiliki proyek menarik atau butuh konsultasi IT? Jangan ragu untuk menghubungi saya melalui WhatsApp.</p>
-          <div className="fade-in fade-in-delay-2">
-            <a href="https://wa.me/628000000000" target="_blank" className="btn-primary">
-              <FaWhatsapp className="text-xl" /> Hubungi Saya di WhatsApp
+      {/* ========================================
+          8. GALLERY SECTION
+          ======================================== */}
+      <section id="gallery" className="section-gap">
+        <div className="container">
+          <div className="text-center mb-60">
+            <div className="section-subtitle fade-up">Galeri Foto</div>
+            <h2 className="section-title fade-up delay-1">Kumpulan Foto & Kegiatan</h2>
+          </div>
+          <div className="gallery-grid">
+            {displayGallery.map((item: any, idx: number) => {
+              const imgUrl = typeof item === 'string' ? item :
+                (item.image_url?.startsWith('http') ? item.image_url : `https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=500&q=80`);
+              return (
+                <div key={idx} className={`gallery-item fade-up delay-${(idx % 3) + 1}`}>
+                  <Image src={imgUrl} alt={item.title || `Gallery ${idx + 1}`} width={500} height={500} unoptimized />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================
+          CTA SECTION
+          ======================================== */}
+      <section className="section-gap cta-section">
+        <div className="container">
+          <h2 className="section-title fade-up">Mari Terhubung dan Berkolaborasi! 🚀</h2>
+          <p className="section-description fade-up delay-1" style={{ margin: '0 auto 32px', textAlign: 'center' }}>
+            Apakah Anda memiliki proyek menarik atau butuh konsultasi IT? Jangan ragu untuk menghubungi saya.
+          </p>
+          <div className="fade-up delay-2" style={{ textAlign: 'center' }}>
+            <a href="https://wa.me/628000000000" target="_blank" rel="noopener" className="tmp-btn">
+              <FaWhatsapp style={{ fontSize: '18px' }} />
+              <span>Hubungi Saya</span>
+              <FaArrowRight className="icon-arrow" />
             </a>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="site-footer">
-        <div className="footer-content">
-          <div className="footer-top">
-            <div className="footer-brand fade-in">
-              <Link href="#home" className="logo-text">
-                {profile?.name?.split(' ')[0] || "Tino"}<span>.</span>
-              </Link>
-              <p>Personal branding, website, cepat, ringan, aman, nyaman, konsultasi gratis.</p>
+      {/* ========================================
+          FOOTER
+          ======================================== */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <Link href="#home" className="logo">{profile?.name?.split(' ')[0] || "Tino"}.</Link>
+              <p className="description">
+                Personal portfolio website. Dibangun dengan Next.js & Supabase. Cepat, ringan, aman, dan modern.
+              </p>
             </div>
-            <div className="footer-links-wrap fade-in fade-in-delay-1">
-              <h4 className="footer-title">Quick Link</h4>
-              <ul className="footer-links">
-                <li><Link href="#home">Home</Link></li>
-                <li><Link href="#about">Tentang</Link></li>
-                <li><Link href="#services">Layanan</Link></li>
-                <li><Link href="#portfolio">Portofolio</Link></li>
-              </ul>
+            <div className="footer-col">
+              <h5 className="ft-title">Quick Link</h5>
+              <div className="ft-link">
+                <Link href="#home">Home</Link>
+                <Link href="#about">Tentang</Link>
+                <Link href="#services">Layanan</Link>
+                <Link href="#skills">Keahlian</Link>
+                <Link href="#portfolio">Portofolio</Link>
+              </div>
             </div>
-            <div className="footer-social-wrap fade-in fade-in-delay-2">
-              <h4 className="footer-title">Find Me</h4>
-              <div className="footer-social">
-                {profile?.github_url && <a href={profile.github_url} target="_blank"><FaGithub /></a>}
-                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank"><FaLinkedin /></a>}
-                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank"><FaInstagram /></a>}
+            <div className="footer-col">
+              <h5 className="ft-title">Find Me</h5>
+              <div className="social-link" style={{ marginTop: '4px' }}>
+                {profile?.github_url && <a href={profile.github_url} target="_blank" rel="noopener"><FaGithub /></a>}
+                {profile?.instagram_url && <a href={profile.instagram_url} target="_blank" rel="noopener"><FaInstagram /></a>}
+                {profile?.linkedin_url && <a href={profile.linkedin_url} target="_blank" rel="noopener"><FaLinkedin /></a>}
               </div>
             </div>
           </div>
-          <div className="footer-bottom fade-in">
+          <div className="footer-bottom">
             <div>&copy; {new Date().getFullYear()} {profile?.name || "Tino Lambut"}. All Rights Reserved.</div>
             <div>Built with Next.js & Supabase</div>
           </div>
