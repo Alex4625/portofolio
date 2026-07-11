@@ -105,9 +105,11 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
   const { data: existingProfile } = await supabase.from("profiles").select("id").limit(1).single();
 
   if (existingProfile) {
-    await supabase.from("profiles").update(payload).eq("id", existingProfile.id);
+    const { error } = await supabase.from("profiles").update(payload).eq("id", existingProfile.id);
+    if (error) throw new Error(error.message);
   } else {
-    await supabase.from("profiles").insert(payload);
+    const { error } = await supabase.from("profiles").insert(payload);
+    if (error) throw new Error(error.message);
   }
 
   revalidatePath("/");
@@ -127,9 +129,11 @@ export async function upsertResourceAction(resource: string, formData: FormData)
   payload.updated_at = new Date().toISOString();
 
   if (id) {
-    await supabase.from(config.table).update(payload).eq("id", id);
+    const { error } = await supabase.from(config.table).update(payload).eq("id", id);
+    if (error) throw new Error(error.message);
   } else {
-    await supabase.from(config.table).insert(payload);
+    const { error } = await supabase.from(config.table).insert(payload);
+    if (error) throw new Error(error.message);
   }
 
   revalidatePath("/");
@@ -143,7 +147,8 @@ export async function deleteResourceAction(resource: string, id: string, filePat
   for (const filePath of filePaths) {
     if (filePath) await deleteFromR2(filePath);
   }
-  await supabase.from(config.table).delete().eq("id", id);
+  const { error } = await supabase.from(config.table).delete().eq("id", id);
+  if (error) throw new Error(error.message);
   revalidatePath("/");
   revalidatePath(config.path);
   revalidatePath("/admin");
