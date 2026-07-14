@@ -4,6 +4,7 @@ import ResumeSection from "@/components/ResumeSection";
 import ServicesSection from "@/components/ServicesSection";
 import PortfolioSection from "@/components/PortfolioSection";
 import GallerySection from "@/components/GallerySection";
+import ContactSection from "@/components/ContactSection";
 
 import { getSiteConfig, getEducations, getServices, getPortfolios, getGalleries } from "@/app/admin/actions";
 import { PROFILE, EDUCATIONS, SERVICES, PORTFOLIOS, GALLERIES } from "@/lib/dummy-data";
@@ -64,6 +65,7 @@ export default async function Home() {
       <ServicesSection data={services} />
       <PortfolioSection data={portfolios} />
       <GallerySection data={galleries} />
+      <ContactSection data={siteConfig} />
     </main>
   );
 }

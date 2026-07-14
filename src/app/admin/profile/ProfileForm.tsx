@@ -12,6 +12,9 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
   const [fullName, setFullName] = useState(initialData?.fullName || "");
   const [role, setRole] = useState(initialData?.role || "");
   const [about, setAbout] = useState(initialData?.about || "");
+  const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
+  const [whatsappNumber, setWhatsappNumber] = useState(initialData?.whatsappNumber || "");
+  const [githubUrl, setGithubUrl] = useState(initialData?.githubUrl || "");
   
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,6 +58,9 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
         role, 
         about, 
         avatarUrl: finalAvatarUrl, 
+        contactEmail,
+        whatsappNumber,
+        githubUrl,
         statsJson: initialData?.statsJson || "[]"
       });
       
@@ -130,6 +136,31 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
                       className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
                     />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email Kontak</label>
+                    <input 
+                      type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)}
+                      className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nomor WhatsApp (Cth: 6281...)</label>
+                    <input 
+                      type="text" value={whatsappNumber} onChange={e => setWhatsappNumber(e.target.value)}
+                      className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-6">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">URL GitHub (Opsional)</label>
+                  <input 
+                    type="url" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username"
+                    className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                  />
                 </div>
 
                 <div className="space-y-4">

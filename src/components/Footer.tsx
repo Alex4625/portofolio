@@ -1,26 +1,24 @@
 "use client";
 
-import { SOCIALS } from "@/lib/dummy-data";
-import { FaInstagram, FaYoutube, FaLinkedin } from "react-icons/fa";
+import { FaInstagram, FaYoutube, FaLinkedin, FaGithub, FaWhatsapp } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 
-export default function Footer() {
+export default function Footer({ data }: { data?: any }) {
   const pathname = usePathname();
 
   // Hide on admin and login routes
   if (pathname.startsWith("/admin") || pathname.startsWith("/login")) {
     return null;
   }
+  
   const getSocialIcon = (iconName: string) => {
     switch (iconName) {
-      case "instagram":
-        return <FaInstagram className="w-5 h-5" />;
-      case "youtube":
-        return <FaYoutube className="w-5 h-5" />;
-      case "linkedin":
-        return <FaLinkedin className="w-5 h-5" />;
-      default:
-        return null;
+      case "instagram": return <FaInstagram className="w-5 h-5" />;
+      case "youtube": return <FaYoutube className="w-5 h-5" />;
+      case "linkedin": return <FaLinkedin className="w-5 h-5" />;
+      case "github": return <FaGithub className="w-5 h-5" />;
+      case "whatsapp": return <FaWhatsapp className="w-5 h-5" />;
+      default: return null;
     }
   };
 
@@ -35,10 +33,10 @@ export default function Footer() {
             Terbuka untuk peluang kerja sama, diskusi proyek, atau sekadar bertukar pikiran seputar teknologi dan pengembangan web.
           </p>
           <a
-            href="mailto:hello@example.com"
+            href={data?.contactEmail ? `mailto:${data.contactEmail}` : "#contact"}
             className="inline-flex items-center justify-center px-8 py-4 text-sm font-bold text-primary bg-white rounded-none shadow-sm hover:bg-accent hover:text-white transition-colors duration-300 min-h-[44px]"
           >
-            Mulai Percakapan
+            Hubungi via Email
           </a>
         </div>
 
@@ -48,18 +46,17 @@ export default function Footer() {
           </p>
 
           <div className="flex items-center gap-4">
-            {SOCIALS.map((social) => (
-              <a
-                key={social.id}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]"
-                aria-label={social.name}
-              >
-                {getSocialIcon(social.icon)}
+            {data?.githubUrl && (
+              <a href={data.githubUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+                {getSocialIcon("github")}
               </a>
-            ))}
+            )}
+            {data?.whatsappNumber && (
+              <a href={`https://wa.me/${data.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+                {getSocialIcon("whatsapp")}
+              </a>
+            )}
+            {/* You can add more social links from `socialLinks` table here if needed */}
           </div>
         </div>
       </div>

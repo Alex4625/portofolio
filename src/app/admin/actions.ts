@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
-import { siteConfig, educations, services, portfolios, galleries } from "@/db/schema";
+import { siteConfig, educations, services, portfolios, galleries, socialLinks } from "@/db/schema";
 import { eq } from "drizzle-orm";
 // Assume opennextjs-cloudflare provides getCloudflareContext
 // If this import fails in Next.js dev, we will handle the fallback or instruct the user to use npm run preview
@@ -167,6 +167,36 @@ export async function deleteGallery(id: string) {
 export async function updateGallery(id: string, data: any) {
   const db = await initDb();
   await db.update(galleries).set(data).where(eq(galleries.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+// ==========================================
+// SOCIAL LINKS
+// ==========================================
+export async function getSocialLinks() {
+  const db = await initDb();
+  return db.select().from(socialLinks).orderBy(socialLinks.orderIndex);
+}
+
+export async function addSocialLink(data: any) {
+  const db = await initDb();
+  const id = crypto.randomUUID();
+  await db.insert(socialLinks).values({ id, ...data });
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function deleteSocialLink(id: string) {
+  const db = await initDb();
+  await db.delete(socialLinks).where(eq(socialLinks.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function updateSocialLink(id: string, data: any) {
+  const db = await initDb();
+  await db.update(socialLinks).set(data).where(eq(socialLinks.id, id));
   revalidatePath("/");
   return { success: true };
 }

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import FooterWrapper from "@/components/FooterWrapper";
 
 export default function RootLayout({
   children,
@@ -40,7 +40,7 @@ export default function RootLayout({
       <body className={`${poppins.variable} ${openSans.variable}`}>
         <Navbar />
         {children}
-        <Footer />
+        <FooterWrapper />
       </body>
     </html>
   );

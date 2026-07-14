@@ -1,10 +1,13 @@
 -- Insert Site Config
-INSERT INTO site_config (id, full_name, role, about, avatar_url, stats_json) VALUES (
+INSERT INTO site_config (id, full_name, role, about, avatar_url, contact_email, whatsapp_number, github_url, stats_json) VALUES (
   'main',
   'Alexander Noventino Lambut',
   'Mahasiswa Informatika & Aspiring Full Stack Developer',
   'Mahasiswa Informatika — Manajemen Data dan Informasi yang antusias dalam membangun aplikasi web modern. Saya senang mengeksplorasi teknologi baru, dari frontend hingga backend, dan terus mengasah kemampuan melalui proyek-proyek nyata selama masa kuliah.',
   'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop',
+  'halo@alexander.com',
+  '6281234567890',
+  'https://github.com/Alex4625',
   '[{"label":"Semester Aktif","value":"6+"},{"label":"Projects Dibuat","value":"10+"},{"label":"Teknologi Dikuasai","value":"8+"}]'
 );
 

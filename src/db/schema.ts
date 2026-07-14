@@ -8,6 +8,9 @@ export const siteConfig = sqliteTable("site_config", {
   about: text("about").notNull(),
   avatarUrl: text("avatar_url").notNull(),
   resumeUrl: text("resume_url"),
+  contactEmail: text("contact_email"),
+  whatsappNumber: text("whatsapp_number"),
+  githubUrl: text("github_url"),
   // Storing simple JSON string for the 3 bento grid stats
   statsJson: text("stats_json").notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
