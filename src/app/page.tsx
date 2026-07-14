@@ -27,7 +27,12 @@ export default async function Home() {
         role: dbConfig.role,
         about: dbConfig.about,
         avatar: dbConfig.avatarUrl || PROFILE.avatarUrl,
-        stats: JSON.parse(dbConfig.statsJson || "[]")
+        stats: JSON.parse(dbConfig.statsJson || "[]"),
+        whatsappNumber: dbConfig.whatsappNumber,
+        githubUrl: dbConfig.githubUrl,
+        instagramUrl: dbConfig.instagramUrl,
+        linkedinUrl: dbConfig.linkedinUrl,
+        youtubeUrl: dbConfig.youtubeUrl
       };
     }
     

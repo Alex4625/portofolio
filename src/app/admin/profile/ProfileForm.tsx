@@ -15,6 +15,9 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
   const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
   const [whatsappNumber, setWhatsappNumber] = useState(initialData?.whatsappNumber || "");
   const [githubUrl, setGithubUrl] = useState(initialData?.githubUrl || "");
+  const [instagramUrl, setInstagramUrl] = useState(initialData?.instagramUrl || "");
+  const [linkedinUrl, setLinkedinUrl] = useState(initialData?.linkedinUrl || "");
+  const [youtubeUrl, setYoutubeUrl] = useState(initialData?.youtubeUrl || "");
   
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -61,6 +64,9 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
         contactEmail,
         whatsappNumber,
         githubUrl,
+        instagramUrl,
+        linkedinUrl,
+        youtubeUrl,
         statsJson: initialData?.statsJson || "[]"
       });
       
@@ -97,8 +103,8 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
 
       {/* Modal Form */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-card border border-border/50 shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex justify-center bg-background/80 backdrop-blur-sm p-4 pt-10 pb-10 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-card border border-border/50 shadow-2xl w-full max-w-2xl h-fit max-h-none flex flex-col relative animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="p-6 md:px-10 md:pt-8 md:pb-6 border-b border-border/20 flex justify-between items-center shrink-0">
@@ -112,7 +118,7 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 md:p-10 overflow-y-auto">
+            <div className="p-6 md:p-10">
               {message && (
                 <div className="mb-6 p-4 bg-accent/10 border border-accent/20 text-accent flex items-center gap-3">
                   {message.includes("Berhasil") ? <CheckCircle2 className="w-5 h-5" /> : <Loader2 className="w-5 h-5 animate-spin" />}
@@ -155,15 +161,41 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
                   </div>
                 </div>
                 
-                <div className="space-y-2 mt-6">
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">URL GitHub (Opsional)</label>
-                  <input 
-                    type="url" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username"
-                    className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
-                  />
+                <div className="space-y-4 mt-6 border-t border-border/20 pt-6">
+                  <h3 className="text-sm font-bold text-primary">Tautan Sosial Media</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">URL GitHub</label>
+                      <input 
+                        type="url" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/username"
+                        className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">URL LinkedIn</label>
+                      <input 
+                        type="url" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/username"
+                        className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">URL Instagram</label>
+                      <input 
+                        type="url" value={instagramUrl} onChange={e => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/username"
+                        className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">URL YouTube</label>
+                      <input 
+                        type="url" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/@username"
+                        className="w-full px-4 py-3 bg-background border border-border/60 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-all placeholder:text-muted-foreground/50 text-primary"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 mt-6 border-t border-border/20 pt-6">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ganti Foto Profil</label>
                   <div className="relative border border-border/60 bg-background focus-within:border-accent focus-within:ring-1 focus-within:ring-accent transition-all p-2 flex items-center">
                     <div className="pl-2 pr-3">

@@ -1,17 +1,15 @@
-import { PROFILE, SOCIALS } from "@/lib/dummy-data";
-import { FaInstagram, FaYoutube, FaLinkedin } from "react-icons/fa";
+import { PROFILE } from "@/lib/dummy-data";
+import { FaInstagram, FaYoutube, FaLinkedin, FaGithub, FaWhatsapp } from "react-icons/fa";
 
 export default function HeroSection({ data }: { data: any }) {
   const getSocialIcon = (iconName: string) => {
     switch (iconName) {
-      case "instagram":
-        return <FaInstagram className="w-5 h-5" />;
-      case "youtube":
-        return <FaYoutube className="w-5 h-5" />;
-      case "linkedin":
-        return <FaLinkedin className="w-5 h-5" />;
-      default:
-        return null;
+      case "instagram": return <FaInstagram className="w-5 h-5" />;
+      case "youtube": return <FaYoutube className="w-5 h-5" />;
+      case "linkedin": return <FaLinkedin className="w-5 h-5" />;
+      case "github": return <FaGithub className="w-5 h-5" />;
+      case "whatsapp": return <FaWhatsapp className="w-5 h-5" />;
+      default: return null;
     }
   };
 
@@ -83,19 +81,32 @@ export default function HeroSection({ data }: { data: any }) {
             </div>
 
             {/* Social Icons row in Hero */}
-            <div className="mt-8 flex items-center justify-center lg:justify-start gap-4 animate-fade-in-up animation-delay-500">
-              {SOCIALS.map((social) => (
-                <a
-                  key={social.id}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300"
-                  aria-label={social.name}
-                >
-                  {getSocialIcon(social.icon)}
+            <div className="mt-8 flex items-center justify-center lg:justify-start flex-wrap gap-4 animate-fade-in-up animation-delay-500">
+              {data?.githubUrl && (
+                <a href={data.githubUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("github")}
                 </a>
-              ))}
+              )}
+              {data?.linkedinUrl && (
+                <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("linkedin")}
+                </a>
+              )}
+              {data?.instagramUrl && (
+                <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("instagram")}
+                </a>
+              )}
+              {data?.youtubeUrl && (
+                <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("youtube")}
+                </a>
+              )}
+              {data?.whatsappNumber && (
+                <a href={`https://wa.me/${data.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("whatsapp")}
+                </a>
+              )}
             </div>
           </div>
 

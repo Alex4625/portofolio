@@ -11,6 +11,9 @@ export const siteConfig = sqliteTable("site_config", {
   contactEmail: text("contact_email"),
   whatsappNumber: text("whatsapp_number"),
   githubUrl: text("github_url"),
+  instagramUrl: text("instagram_url"),
+  linkedinUrl: text("linkedin_url"),
+  youtubeUrl: text("youtube_url"),
   // Storing simple JSON string for the 3 bento grid stats
   statsJson: text("stats_json").notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),

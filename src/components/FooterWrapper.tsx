@@ -12,7 +12,10 @@ export default async function FooterWrapper() {
         ...dbConfig,
         contactEmail: dbConfig.contactEmail || "hello@example.com",
         whatsappNumber: dbConfig.whatsappNumber || "",
-        githubUrl: dbConfig.githubUrl || ""
+        githubUrl: dbConfig.githubUrl || "",
+        instagramUrl: dbConfig.instagramUrl || "",
+        linkedinUrl: dbConfig.linkedinUrl || "",
+        youtubeUrl: dbConfig.youtubeUrl || ""
       };
     }
   } catch (err) {

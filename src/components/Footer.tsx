@@ -45,10 +45,25 @@ export default function Footer({ data }: { data?: any }) {
             &copy; {new Date().getFullYear()} Alexander Noventino Lambut. All rights reserved.
           </p>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center flex-wrap justify-center gap-4">
             {data?.githubUrl && (
               <a href={data.githubUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
                 {getSocialIcon("github")}
+              </a>
+            )}
+            {data?.linkedinUrl && (
+              <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+                {getSocialIcon("linkedin")}
+              </a>
+            )}
+            {data?.instagramUrl && (
+              <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+                {getSocialIcon("instagram")}
+              </a>
+            )}
+            {data?.youtubeUrl && (
+              <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+                {getSocialIcon("youtube")}
               </a>
             )}
             {data?.whatsappNumber && (
@@ -56,7 +71,6 @@ export default function Footer({ data }: { data?: any }) {
                 {getSocialIcon("whatsapp")}
               </a>
             )}
-            {/* You can add more social links from `socialLinks` table here if needed */}
           </div>
         </div>
       </div>

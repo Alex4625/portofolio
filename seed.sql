@@ -1,5 +1,5 @@
 -- Insert Site Config
-INSERT INTO site_config (id, full_name, role, about, avatar_url, contact_email, whatsapp_number, github_url, stats_json) VALUES (
+INSERT INTO site_config (id, full_name, role, about, avatar_url, contact_email, whatsapp_number, github_url, instagram_url, linkedin_url, youtube_url, stats_json) VALUES (
   'main',
   'Alexander Noventino Lambut',
   'Mahasiswa Informatika & Aspiring Full Stack Developer',
@@ -8,6 +8,9 @@ INSERT INTO site_config (id, full_name, role, about, avatar_url, contact_email, 
   'halo@alexander.com',
   '6281234567890',
   'https://github.com/Alex4625',
+  'https://instagram.com/',
+  'https://linkedin.com/in/',
+  'https://youtube.com/',
   '[{"label":"Semester Aktif","value":"6+"},{"label":"Projects Dibuat","value":"10+"},{"label":"Teknologi Dikuasai","value":"8+"}]'
 );
 
