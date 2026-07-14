@@ -46,31 +46,21 @@ export default function Footer({ data }: { data?: any }) {
           </p>
 
           <div className="flex items-center flex-wrap justify-center gap-4">
-            {data?.githubUrl && (
-              <a href={data.githubUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
-                {getSocialIcon("github")}
-              </a>
-            )}
-            {data?.linkedinUrl && (
-              <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
-                {getSocialIcon("linkedin")}
-              </a>
-            )}
-            {data?.instagramUrl && (
-              <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
-                {getSocialIcon("instagram")}
-              </a>
-            )}
-            {data?.youtubeUrl && (
-              <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
-                {getSocialIcon("youtube")}
-              </a>
-            )}
-            {data?.whatsappNumber && (
-              <a href={`https://wa.me/${data.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
-                {getSocialIcon("whatsapp")}
-              </a>
-            )}
+            <a href={data?.githubUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+              {getSocialIcon("github")}
+            </a>
+            <a href={data?.linkedinUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+              {getSocialIcon("linkedin")}
+            </a>
+            <a href={data?.instagramUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+              {getSocialIcon("instagram")}
+            </a>
+            <a href={data?.youtubeUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+              {getSocialIcon("youtube")}
+            </a>
+            <a href={data?.whatsappNumber ? `https://wa.me/${data.whatsappNumber}` : "#"} target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center rounded-none bg-white/5 border border-white/10 text-white hover:bg-accent hover:border-accent transition-all duration-300 min-h-[44px] min-w-[44px]">
+              {getSocialIcon("whatsapp")}
+            </a>
           </div>
         </div>
       </div>

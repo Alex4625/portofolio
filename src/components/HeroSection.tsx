@@ -82,31 +82,21 @@ export default function HeroSection({ data }: { data: any }) {
 
             {/* Social Icons row in Hero */}
             <div className="mt-8 flex items-center justify-center lg:justify-start flex-wrap gap-4 animate-fade-in-up animation-delay-500">
-              {data?.githubUrl && (
-                <a href={data.githubUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                  {getSocialIcon("github")}
-                </a>
-              )}
-              {data?.linkedinUrl && (
-                <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                  {getSocialIcon("linkedin")}
-                </a>
-              )}
-              {data?.instagramUrl && (
-                <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                  {getSocialIcon("instagram")}
-                </a>
-              )}
-              {data?.youtubeUrl && (
-                <a href={data.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                  {getSocialIcon("youtube")}
-                </a>
-              )}
-              {data?.whatsappNumber && (
-                <a href={`https://wa.me/${data.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                  {getSocialIcon("whatsapp")}
-                </a>
-              )}
+              <a href={data?.githubUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                {getSocialIcon("github")}
+              </a>
+              <a href={data?.linkedinUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                {getSocialIcon("linkedin")}
+              </a>
+              <a href={data?.instagramUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                {getSocialIcon("instagram")}
+              </a>
+              <a href={data?.youtubeUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                {getSocialIcon("youtube")}
+              </a>
+              <a href={data?.whatsappNumber ? `https://wa.me/${data.whatsappNumber}` : "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                {getSocialIcon("whatsapp")}
+              </a>
             </div>
           </div>
 
