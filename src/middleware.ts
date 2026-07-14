@@ -10,10 +10,9 @@ export async function middleware(request: NextRequest) {
   
   const isValidToken = await verifyToken(token);
 
-  // Exact match /admin -> redirect to /admin/profile
+  // Exact match /admin -> just check auth
   if (path === '/admin' || path === '/admin/') {
     if (!isValidToken) return NextResponse.redirect(new URL('/login', request.url));
-    return NextResponse.redirect(new URL('/admin/profile', request.url));
   }
 
   // Protect /admin/* routes
