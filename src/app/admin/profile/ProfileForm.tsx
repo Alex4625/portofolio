@@ -103,8 +103,9 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
 
       {/* Modal Form */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex justify-center bg-background/80 backdrop-blur-sm p-4 pt-10 pb-10 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-card border border-border/50 shadow-2xl w-full max-w-2xl h-fit max-h-none flex flex-col relative animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-background/80 backdrop-blur-sm">
+          <div className="flex min-h-full items-start justify-center p-4 py-12">
+            <div className="bg-card border border-border/50 shadow-2xl w-full max-w-2xl flex flex-col relative animate-in zoom-in-95 duration-200">
             
             {/* Modal Header */}
             <div className="p-6 md:px-10 md:pt-8 md:pb-6 border-b border-border/20 flex justify-between items-center shrink-0">
@@ -236,6 +237,7 @@ export default function ProfileForm({ initialData }: { initialData: any }) {
             </div>
           </div>
         </div>
+      </div>
       )}
     </div>
   );
