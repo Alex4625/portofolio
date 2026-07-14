@@ -3,8 +3,17 @@ import { getAnalyticsData, getPortfolios } from "./actions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const analyticsData = await getAnalyticsData();
-  const portfoliosData = await getPortfolios();
+  let analyticsData = { pageViews: 0, portfolioClicks: [] as { portfolioId: string, count: number }[] };
+  let portfoliosData: any[] = [];
+  let errorMsg = null;
+
+  try {
+    analyticsData = await getAnalyticsData();
+    portfoliosData = await getPortfolios();
+  } catch (err: any) {
+    console.error("Failed to load analytics data:", err);
+    errorMsg = err.message || "Gagal memuat data dari database.";
+  }
 
   return (
     <div className="space-y-8">
@@ -12,6 +21,12 @@ export default async function AdminDashboard() {
         <h1 className="text-3xl font-heading font-bold text-primary mb-2">Dasbor Analitik</h1>
         <p className="text-muted-foreground">Pantau lalu lintas dan interaksi pengunjung di portofolio Anda.</p>
       </div>
+
+      {errorMsg && (
+        <div className="bg-destructive/10 text-destructive px-4 py-3 rounded border border-destructive/20 text-sm">
+          <strong>Perhatian:</strong> {errorMsg} (Jika Anda menjalankan server lokal dengan `npm run dev`, database Cloudflare D1 mungkin tidak tersedia. Gunakan `npm run preview` untuk pengalaman penuh).
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-card p-6 border border-border shadow-sm">
