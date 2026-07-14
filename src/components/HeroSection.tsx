@@ -1,5 +1,7 @@
 import { PROFILE } from "@/lib/dummy-data";
 import { FaInstagram, FaYoutube, FaLinkedin, FaGithub, FaWhatsapp } from "react-icons/fa";
+import ScrollReveal from "./ScrollReveal";
+import { motion } from "framer-motion";
 
 export default function HeroSection({ data }: { data: any }) {
   const getSocialIcon = (iconName: string) => {
@@ -27,81 +29,97 @@ export default function HeroSection({ data }: { data: any }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center py-16 lg:py-0">
           {/* Left content — 55% text block */}
           <div className="order-2 lg:order-1 text-center lg:text-left">
-            {/* Eyebrow label */}
-            <span className="inline-block px-4 py-1.5 mb-6 text-xs font-medium tracking-[0.15em] uppercase text-accent bg-accent/10 rounded-full animate-fade-in-up">
-              Mahasiswa Informatika
-            </span>
+            <ScrollReveal delay={0.1}>
+              {/* Eyebrow label */}
+              <span className="inline-block px-4 py-1.5 mb-6 text-xs font-medium tracking-[0.15em] uppercase text-accent bg-accent/10 rounded-full">
+                Mahasiswa Informatika
+              </span>
+            </ScrollReveal>
 
-            {/* H1 Headline — Poppins Bold, 40-64px */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold tracking-tight text-primary leading-tight">
-              Hello, saya <br />
-              {data.name}
-            </h1>
+            <ScrollReveal delay={0.2}>
+              {/* H1 Headline — Poppins Bold, 40-64px */}
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold tracking-tight text-primary leading-tight">
+                Hello, saya <br />
+                {data.name}
+              </h1>
+            </ScrollReveal>
 
-            {/* Supporting subtext */}
-            <p className="mt-4 text-lg sm:text-xl font-medium text-accent/80 animate-fade-in-up animation-delay-200">
-              {data.role}
-            </p>
+            <ScrollReveal delay={0.3}>
+              {/* Supporting subtext */}
+              <p className="mt-4 text-lg sm:text-xl font-medium text-accent/80">
+                {data.role}
+              </p>
+            </ScrollReveal>
 
-            {/* One-sentence description — 16-18px, muted */}
-            <p className="mt-6 max-w-xl text-base sm:text-[17px] leading-relaxed text-muted-foreground animate-fade-in-up animation-delay-300 mx-auto lg:mx-0">
-              {PROFILE.about}
-            </p>
+            <ScrollReveal delay={0.4}>
+              {/* One-sentence description — 16-18px, muted */}
+              <p className="mt-6 max-w-xl text-base sm:text-[17px] leading-relaxed text-muted-foreground mx-auto lg:mx-0">
+                {PROFILE.about}
+              </p>
+            </ScrollReveal>
 
-            {/* CTA Buttons */}
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in-up animation-delay-400">
-              {/* Primary CTA — accent, rounded-full, min 44px height */}
-              <a
-                href="#portfolio"
-                className="group inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-accent rounded-full shadow-sm hover:shadow-md hover:brightness-110 transition min-h-[44px]"
-              >
-                Lihat Karya Saya
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="transition-transform duration-300 group-hover:translate-x-1"
+            <ScrollReveal delay={0.5}>
+              {/* CTA Buttons */}
+              <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                {/* Primary CTA — accent, rounded-full, min 44px height */}
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="#portfolio"
+                  className="group inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-accent rounded-full shadow-sm hover:shadow-md hover:brightness-110 transition min-h-[44px]"
                 >
-                  <path d="m9 18 6-6-6-6" />
-                </svg>
-              </a>
-              {/* Secondary/Outline CTA */}
-              <a
-                href="#about"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-primary border border-primary rounded-full hover:bg-primary hover:text-white transition min-h-[44px]"
-              >
-                Tentang Saya
-              </a>
-            </div>
+                  Lihat Karya Saya
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform duration-300 group-hover:translate-x-1"
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </motion.a>
+                {/* Secondary/Outline CTA */}
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="#about"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-primary border border-primary rounded-full hover:bg-primary hover:text-white transition min-h-[44px]"
+                >
+                  Tentang Saya
+                </motion.a>
+              </div>
+            </ScrollReveal>
 
-            {/* Social Icons row in Hero */}
-            <div className="mt-8 flex items-center justify-center lg:justify-start flex-wrap gap-4 animate-fade-in-up animation-delay-500">
-              <a href={data?.githubUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                {getSocialIcon("github")}
-              </a>
-              <a href={data?.linkedinUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                {getSocialIcon("linkedin")}
-              </a>
-              <a href={data?.instagramUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                {getSocialIcon("instagram")}
-              </a>
-              <a href={data?.youtubeUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                {getSocialIcon("youtube")}
-              </a>
-              <a href={data?.whatsappNumber ? `https://wa.me/${data.whatsappNumber}` : "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
-                {getSocialIcon("whatsapp")}
-              </a>
-            </div>
+            <ScrollReveal delay={0.6}>
+              {/* Social Icons row in Hero */}
+              <div className="mt-8 flex items-center justify-center lg:justify-start flex-wrap gap-4">
+                <motion.a whileHover={{ y: -5 }} href={data?.githubUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("github")}
+                </motion.a>
+                <motion.a whileHover={{ y: -5 }} href={data?.linkedinUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("linkedin")}
+                </motion.a>
+                <motion.a whileHover={{ y: -5 }} href={data?.instagramUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("instagram")}
+                </motion.a>
+                <motion.a whileHover={{ y: -5 }} href={data?.youtubeUrl || "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("youtube")}
+                </motion.a>
+                <motion.a whileHover={{ y: -5 }} href={data?.whatsappNumber ? `https://wa.me/${data.whatsappNumber}` : "#"} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-none bg-accent/5 border border-accent/10 text-primary hover:bg-accent hover:text-white hover:border-accent transition-all duration-300">
+                  {getSocialIcon("whatsapp")}
+                </motion.a>
+              </div>
+            </ScrollReveal>
           </div>
 
           {/* Right content — 45% portrait */}
-          <div className="order-1 lg:order-2 flex justify-center lg:justify-end animate-fade-in-up animation-delay-200">
+          <ScrollReveal direction="left" delay={0.3} className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <div className="relative">
               {/* Soft colored glow behind portrait */}
               <div className="absolute -inset-6 rounded-none bg-accent/10 blur-2xl animate-pulse-slow" />
@@ -116,12 +134,16 @@ export default function HeroSection({ data }: { data: any }) {
               </div>
 
               {/* Floating badge — stat card */}
-              <div className="absolute -bottom-4 -left-4 sm:bottom-6 sm:-left-6 bg-card px-5 py-3 rounded-none shadow-md border border-border animate-float">
+              <motion.div 
+                animate={{ y: [0, -15, 0] }} 
+                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                className="absolute -bottom-4 -left-4 sm:bottom-6 sm:-left-6 bg-card px-5 py-3 rounded-none shadow-lg border border-border"
+              >
                 <p className="text-2xl font-heading font-bold text-accent">{PROFILE.stats[0].value}</p>
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{PROFILE.stats[0].label}</p>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

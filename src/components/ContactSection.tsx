@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FaWhatsapp } from "react-icons/fa";
+import ScrollReveal from "./ScrollReveal";
 
 export default function ContactSection({ data }: { data: any }) {
   const [message, setMessage] = useState("");
@@ -14,13 +15,16 @@ export default function ContactSection({ data }: { data: any }) {
 
   return (
     <section id="contact" className="py-24 bg-background border-t border-border/50">
-      <div className="max-w-3xl mx-auto px-6 text-center animate-fade-in-up">
-        <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6">Mulai Percakapan</h2>
-        <p className="text-muted-foreground mb-10 max-w-2xl mx-auto">
-          Tertarik untuk berkolaborasi atau sekadar bertukar pikiran? Kirimkan pesan langsung ke WhatsApp saya!
-        </p>
+      <div className="max-w-3xl mx-auto px-6 text-center">
+        <ScrollReveal>
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-primary mb-6">Mulai Percakapan</h2>
+          <p className="text-muted-foreground mb-10 max-w-2xl mx-auto">
+            Tertarik untuk berkolaborasi atau sekadar bertukar pikiran? Kirimkan pesan langsung ke WhatsApp saya!
+          </p>
+        </ScrollReveal>
         
-        <div className="bg-card border border-border/50 p-6 md:p-8 text-left shadow-lg">
+        <ScrollReveal delay={0.2}>
+          <div className="bg-card border border-border/50 p-6 md:p-8 text-left shadow-lg">
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -37,10 +41,10 @@ export default function ContactSection({ data }: { data: any }) {
               className="w-full md:w-auto px-8 py-3 bg-[#25D366] text-white font-bold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <FaWhatsapp className="w-5 h-5" />
-              Kirim Pesan via WhatsApp
             </button>
           </div>
         </div>
+        </ScrollReveal>
       </div>
     </section>
   );
