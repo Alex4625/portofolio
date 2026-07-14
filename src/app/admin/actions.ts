@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { getDb } from "@/db";
 import { siteConfig, educations, services, portfolios, galleries, socialLinks, analytics } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
+import { verifyToken } from "@/lib/auth";
 // Assume opennextjs-cloudflare provides getCloudflareContext
 // If this import fails in Next.js dev, we will handle the fallback or instruct the user to use npm run preview
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -11,6 +13,15 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 async function initDb() {
   const { env } = await getCloudflareContext();
   return getDb((env as any).DB);
+}
+
+async function requireAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("admin_token")?.value;
+  const isValid = await verifyToken(token);
+  if (!isValid) {
+    throw new Error("Unauthorized access. Token invalid or missing.");
+  }
 }
 
 // --- Security Sanitization Helpers ---
@@ -42,6 +53,7 @@ export async function getSiteConfig() {
 }
 
 export async function upsertSiteConfig(data: any) {
+  await requireAuth();
   const db = await initDb();
   const existing = await getSiteConfig();
   
@@ -73,6 +85,7 @@ export async function getEducations() {
 }
 
 export async function addEducation(data: any) {
+  await requireAuth();
   const db = await initDb();
   const id = crypto.randomUUID();
   await db.insert(educations).values({ id, ...data });
@@ -81,6 +94,7 @@ export async function addEducation(data: any) {
 }
 
 export async function deleteEducation(id: string) {
+  await requireAuth();
   const db = await initDb();
   await db.delete(educations).where(eq(educations.id, id));
   revalidatePath("/");
@@ -88,6 +102,7 @@ export async function deleteEducation(id: string) {
 }
 
 export async function updateEducation(id: string, data: any) {
+  await requireAuth();
   const db = await initDb();
   await db.update(educations).set(data).where(eq(educations.id, id));
   revalidatePath("/");
@@ -103,6 +118,7 @@ export async function getServices() {
 }
 
 export async function addService(data: any) {
+  await requireAuth();
   const db = await initDb();
   const id = crypto.randomUUID();
   await db.insert(services).values({ id, ...data });
@@ -111,6 +127,7 @@ export async function addService(data: any) {
 }
 
 export async function deleteService(id: string) {
+  await requireAuth();
   const db = await initDb();
   await db.delete(services).where(eq(services.id, id));
   revalidatePath("/");
@@ -118,6 +135,7 @@ export async function deleteService(id: string) {
 }
 
 export async function updateService(id: string, data: any) {
+  await requireAuth();
   const db = await initDb();
   await db.update(services).set(data).where(eq(services.id, id));
   revalidatePath("/");
@@ -141,6 +159,7 @@ export async function addPortfolio(data: {
   techStackJson: string;
   orderIndex: number;
 }) {
+  await requireAuth();
   const db = await initDb();
   await db.insert(portfolios).values({
     id: crypto.randomUUID(),
@@ -157,6 +176,7 @@ export async function addPortfolio(data: {
 }
 
 export async function deletePortfolio(id: string) {
+  await requireAuth();
   const db = await initDb();
   await db.delete(portfolios).where(eq(portfolios.id, id));
   revalidatePath("/");
@@ -164,6 +184,7 @@ export async function deletePortfolio(id: string) {
 }
 
 export async function updatePortfolio(id: string, data: any) {
+  await requireAuth();
   const db = await initDb();
   const sanitizedData = { ...data };
   if (data.projectUrl !== undefined) {
@@ -183,6 +204,7 @@ export async function getGalleries() {
 }
 
 export async function addGallery(data: any) {
+  await requireAuth();
   const db = await initDb();
   const id = crypto.randomUUID();
   await db.insert(galleries).values({ id, ...data });
@@ -191,6 +213,7 @@ export async function addGallery(data: any) {
 }
 
 export async function deleteGallery(id: string) {
+  await requireAuth();
   const db = await initDb();
   await db.delete(galleries).where(eq(galleries.id, id));
   revalidatePath("/");
@@ -198,6 +221,7 @@ export async function deleteGallery(id: string) {
 }
 
 export async function updateGallery(id: string, data: any) {
+  await requireAuth();
   const db = await initDb();
   await db.update(galleries).set(data).where(eq(galleries.id, id));
   revalidatePath("/");
@@ -215,6 +239,7 @@ export async function getSocialLinks() {
 }
 
 export async function addSocialLink(data: Omit<typeof socialLinks.$inferInsert, "id">) {
+  await requireAuth();
   const db = await initDb();
   if (!db) throw new Error("Database not initialized");
   await db.insert(socialLinks).values({ ...data, id: crypto.randomUUID() });
@@ -223,6 +248,7 @@ export async function addSocialLink(data: Omit<typeof socialLinks.$inferInsert, 
 }
 
 export async function updateSocialLink(id: string, data: Partial<Omit<typeof socialLinks.$inferInsert, "id">>) {
+  await requireAuth();
   const db = await initDb();
   if (!db) throw new Error("Database not initialized");
   await db.update(socialLinks).set(data).where(eq(socialLinks.id, id));
@@ -231,6 +257,7 @@ export async function updateSocialLink(id: string, data: Partial<Omit<typeof soc
 }
 
 export async function deleteSocialLink(id: string) {
+  await requireAuth();
   const db = await initDb();
   if (!db) throw new Error("Database not initialized");
   await db.delete(socialLinks).where(eq(socialLinks.id, id));
@@ -241,6 +268,12 @@ export async function deleteSocialLink(id: string) {
 // ANALYTICS ACTIONS
 export async function recordPageView() {
   try {
+    // Anti-spam protection using cookies
+    const cookieStore = await cookies();
+    if (cookieStore.has("view_tracked")) {
+      return; // Already tracked for this session/user
+    }
+
     const db = await initDb();
     if (!db) return;
     
@@ -259,6 +292,9 @@ export async function recordPageView() {
         count: 1
       });
     }
+
+    // Set cookie so we don't track again for 1 hour
+    cookieStore.set("view_tracked", "1", { maxAge: 3600, httpOnly: true });
   } catch (error) {
     console.error("Failed to record page view", error);
   }
@@ -266,6 +302,12 @@ export async function recordPageView() {
 
 export async function recordPortfolioClick(portfolioId: string) {
   try {
+    const cookieStore = await cookies();
+    const cookieName = `click_${portfolioId}`;
+    if (cookieStore.has(cookieName)) {
+      return; // Already clicked recently
+    }
+
     const db = await initDb();
     if (!db) return;
     
@@ -284,6 +326,9 @@ export async function recordPortfolioClick(portfolioId: string) {
         count: 1
       });
     }
+
+    // Set cookie to prevent spamming for 1 hour
+    cookieStore.set(cookieName, "1", { maxAge: 3600, httpOnly: true });
   } catch (error) {
     console.error("Failed to record portfolio click", error);
   }
