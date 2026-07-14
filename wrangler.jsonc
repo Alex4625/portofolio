@@ -23,5 +23,19 @@
 			"database_name": "ituaku-db",
 			"database_id": "4ca88981-d40e-4dfa-bcca-d32dbb9827df"
 		}
-	]
+	],
+	// Cloudflare R2 Storage Binding
+	"r2_buckets": [
+		{
+			"binding": "BUCKET",
+			"bucket_name": "portofolio-assets"
+		}
+	],
+	// Environment Variables
+	"vars": {
+		"NODE_ENV": "production",
+		"ADMIN_PASSWORD": "admin",
+		"AUTH_SECRET": "kunci_rahasia_portofolio_super_kuat_123!",
+		"NEXT_PUBLIC_R2_PUBLIC_URL": "https://pub-c08c3314a908489c9bc483ddbf2f0837.r2.dev"
+	}
 }

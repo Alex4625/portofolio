@@ -1,10 +1,12 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getEnv } from "@/lib/env";
 
 export async function POST(request: Request) {
   try {
     const { password } = await request.json();
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    const env = await getEnv();
+    const adminPassword = env.ADMIN_PASSWORD;
 
     if (!adminPassword) {
       return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
@@ -12,10 +14,10 @@ export async function POST(request: Request) {
 
     if (password === adminPassword) {
       const cookieStore = await cookies();
-      const secret = process.env.AUTH_SECRET || "fallback_secret";
+      const secret = env.AUTH_SECRET || "fallback_secret";
       cookieStore.set("admin_token", secret, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
       });

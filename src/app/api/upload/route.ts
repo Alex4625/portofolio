@@ -2,13 +2,15 @@ import { NextResponse } from "next/server";
 import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getR2Client } from "@/lib/r2";
 import { cookies } from "next/headers";
+import { getEnv } from "@/lib/env";
 
 export async function POST(request: Request) {
   try {
     // 1. Authenticate request using the admin_token cookie
     const cookieStore = await cookies();
     const token = cookieStore.get("admin_token");
-    const authSecret = process.env.AUTH_SECRET || "fallback_secret";
+    const env = await getEnv();
+    const authSecret = env.AUTH_SECRET || "fallback_secret";
     
     if (!token || token.value !== authSecret) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -28,24 +30,30 @@ export async function POST(request: Request) {
     const filename = `${uniqueSuffix}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
     
     // 4. Upload to R2
-    const client = getR2Client();
-    const bucketName = process.env.R2_BUCKET_NAME;
+    if (env.BUCKET) {
+      await env.BUCKET.put(filename, buffer, {
+        httpMetadata: { contentType: file.type },
+      });
+    } else {
+      const client = getR2Client();
+      const bucketName = env.R2_BUCKET_NAME;
 
-    if (!bucketName) {
-      throw new Error("R2_BUCKET_NAME is not set");
+      if (!bucketName) {
+        throw new Error("R2_BUCKET_NAME is not set");
+      }
+
+      await client.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: filename,
+          Body: buffer,
+          ContentType: file.type,
+        })
+      );
     }
 
-    await client.send(
-      new PutObjectCommand({
-        Bucket: bucketName,
-        Key: filename,
-        Body: buffer,
-        ContentType: file.type,
-      })
-    );
-
     // 5. Return public URL
-    const publicUrl = `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${filename}`;
+    const publicUrl = `${env.NEXT_PUBLIC_R2_PUBLIC_URL}/${filename}`;
 
     return NextResponse.json({ success: true, url: publicUrl });
   } catch (error) {
@@ -58,7 +66,8 @@ export async function DELETE(request: Request) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("admin_token");
-    const authSecret = process.env.AUTH_SECRET || "fallback_secret";
+    const env = await getEnv();
+    const authSecret = env.AUTH_SECRET || "fallback_secret";
     
     if (!token || token.value !== authSecret) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -80,19 +89,23 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Invalid URL format" }, { status: 400 });
     }
 
-    const client = getR2Client();
-    const bucketName = process.env.R2_BUCKET_NAME;
+    if (env.BUCKET) {
+      await env.BUCKET.delete(filename);
+    } else {
+      const client = getR2Client();
+      const bucketName = env.R2_BUCKET_NAME;
 
-    if (!bucketName) {
-      throw new Error("R2_BUCKET_NAME is not set");
+      if (!bucketName) {
+        throw new Error("R2_BUCKET_NAME is not set");
+      }
+
+      await client.send(
+        new DeleteObjectCommand({
+          Bucket: bucketName,
+          Key: filename,
+        })
+      );
     }
-
-    await client.send(
-      new DeleteObjectCommand({
-        Bucket: bucketName,
-        Key: filename,
-      })
-    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
