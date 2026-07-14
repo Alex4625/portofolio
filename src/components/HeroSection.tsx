@@ -1,3 +1,5 @@
+"use client";
+
 import { PROFILE } from "@/lib/dummy-data";
 import { FaInstagram, FaYoutube, FaLinkedin, FaGithub, FaWhatsapp } from "react-icons/fa";
 import ScrollReveal from "./ScrollReveal";
