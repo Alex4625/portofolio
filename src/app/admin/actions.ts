@@ -13,6 +13,25 @@ async function initDb() {
   return getDb((env as any).DB);
 }
 
+// --- Security Sanitization Helpers ---
+function sanitizeExternalUrl(url?: string) {
+  if (!url) return "";
+  const trimmed = url.trim();
+  // Prevent javascript: and data: URI XSS attacks
+  if (/^(javascript|data|vbscript):/i.test(trimmed)) return "";
+  // Auto-prefix external links if missing protocol
+  if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
+    return `https://${trimmed}`;
+  }
+  return trimmed;
+}
+
+function sanitizePhone(phone?: string) {
+  if (!phone) return "";
+  // Strip everything except numbers
+  return phone.replace(/[^0-9]/g, "");
+}
+
 // ==========================================
 // SITE CONFIG (Profile & About)
 // ==========================================
@@ -26,10 +45,20 @@ export async function upsertSiteConfig(data: any) {
   const db = await initDb();
   const existing = await getSiteConfig();
   
+  // Sanitize data to prevent stored XSS
+  const sanitizedData = {
+    ...data,
+    githubUrl: sanitizeExternalUrl(data.githubUrl),
+    instagramUrl: sanitizeExternalUrl(data.instagramUrl),
+    linkedinUrl: sanitizeExternalUrl(data.linkedinUrl),
+    youtubeUrl: sanitizeExternalUrl(data.youtubeUrl),
+    whatsappNumber: sanitizePhone(data.whatsappNumber),
+  };
+
   if (existing) {
-    await db.update(siteConfig).set(data).where(eq(siteConfig.id, "main"));
+    await db.update(siteConfig).set(sanitizedData).where(eq(siteConfig.id, "main"));
   } else {
-    await db.insert(siteConfig).values({ id: "main", ...data });
+    await db.insert(siteConfig).values({ id: "main", ...sanitizedData });
   }
   revalidatePath("/");
   return { success: true };
@@ -117,8 +146,8 @@ export async function addPortfolio(data: {
     id: crypto.randomUUID(),
     title: data.title,
     description: data.description,
-    mediaUrl: data.mediaUrl,
-    projectUrl: data.projectUrl,
+    mediaUrl: data.mediaUrl, // Local or trusted image URL
+    projectUrl: sanitizeExternalUrl(data.projectUrl), // Sanitize external link
     isVideo: data.isVideo,
     techStackJson: data.techStackJson,
     orderIndex: data.orderIndex,
@@ -136,7 +165,11 @@ export async function deletePortfolio(id: string) {
 
 export async function updatePortfolio(id: string, data: any) {
   const db = await initDb();
-  await db.update(portfolios).set(data).where(eq(portfolios.id, id));
+  const sanitizedData = { ...data };
+  if (data.projectUrl !== undefined) {
+    sanitizedData.projectUrl = sanitizeExternalUrl(data.projectUrl);
+  }
+  await db.update(portfolios).set(sanitizedData).where(eq(portfolios.id, id));
   revalidatePath("/");
   return { success: true };
 }
