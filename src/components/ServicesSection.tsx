@@ -52,7 +52,7 @@ export default function ServicesSection({ data }: { data: any[] }) {
                 <div className="w-14 h-14 rounded-none bg-accent/10 flex items-center justify-center mb-6 border border-accent/20 group-hover:bg-accent group-hover:border-accent transition-colors duration-300">
                   {/* We need to change icon color on hover using css group-hover */}
                   <div className="text-accent group-hover:text-white transition-colors duration-300 flex items-center justify-center w-full h-full">
-                    {getIcon(service.iconUrl)}
+                    {getIcon(service.iconName)}
                   </div>
                 </div>
 
