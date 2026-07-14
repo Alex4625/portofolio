@@ -16,16 +16,49 @@ const openSans = Open_Sans({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Alexander Noventino Lambut — Mahasiswa Informatika & Aspiring Developer",
-  description: "Portofolio Alexander Noventino Lambut. Mahasiswa Informatika yang antusias membangun aplikasi web modern dan responsif.",
-  keywords: ["portofolio", "mahasiswa", "informatika", "web developer", "next.js"],
-  openGraph: {
-    title: "Alexander Noventino Lambut — Mahasiswa Informatika",
-    description: "Portofolio Alexander Noventino Lambut.",
-    type: "website",
-  },
-};
+import { getSiteConfig } from "@/app/admin/actions";
+import { PROFILE } from "@/lib/dummy-data";
+
+export async function generateMetadata(): Promise<Metadata> {
+  let config = null;
+  try {
+    config = await getSiteConfig();
+  } catch (e) {
+    // getSiteConfig will fail during prerendering because getCloudflareContext is not available
+    console.warn("Failed to load site config for metadata", e);
+  }
+  const name = config?.fullName || PROFILE.fullName;
+  const role = config?.role || PROFILE.role;
+  const about = config?.about || PROFILE.about;
+  const avatar = config?.avatarUrl || PROFILE.avatarUrl;
+
+  return {
+    title: `${name} — ${role}`,
+    description: about,
+    keywords: ["portofolio", "developer", "freelancer", "software engineer", name],
+    openGraph: {
+      title: `${name} — ${role}`,
+      description: about,
+      url: "https://portofolio.tinolambut.workers.dev",
+      siteName: `${name} Portfolio`,
+      images: [
+        {
+          url: avatar,
+          width: 800,
+          height: 600,
+          alt: `${name} Profile`,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} — ${role}`,
+      description: about,
+      images: [avatar],
+    },
+  };
+}
 
 import Navbar from "@/components/Navbar";
 import FooterWrapper from "@/components/FooterWrapper";
