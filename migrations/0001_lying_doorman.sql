@@ -1,0 +1,1 @@
+ALTER TABLE `portfolios` ADD `project_url` text;

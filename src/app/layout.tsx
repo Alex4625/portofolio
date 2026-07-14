@@ -1,21 +1,34 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Outfit } from "next/font/google";
+import { Poppins, Open_Sans } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-open-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Tino Lambut — Full Stack Developer & Cyber Security",
-  description: "Portofolio profesional Tino Lambut. Full Stack Web Developer yang bersemangat dalam membangun aplikasi web modern dan responsif.",
-  keywords: ["portofolio", "developer", "full stack", "cyber security", "web developer"],
+  title: "Alexander Noventino Lambut — Mahasiswa Informatika & Aspiring Developer",
+  description: "Portofolio Alexander Noventino Lambut. Mahasiswa Informatika yang antusias membangun aplikasi web modern dan responsif.",
+  keywords: ["portofolio", "mahasiswa", "informatika", "web developer", "next.js"],
   openGraph: {
-    title: "Tino Lambut — Full Stack Developer",
-    description: "Portofolio profesional Tino Lambut.",
+    title: "Alexander Noventino Lambut — Mahasiswa Informatika",
+    description: "Portofolio Alexander Noventino Lambut.",
     type: "website",
   },
 };
+
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -24,8 +37,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${outfit.variable} ${inter.variable} ${jetbrains.variable}`}>
+      <body className={`${poppins.variable} ${openSans.variable}`}>
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

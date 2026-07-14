@@ -1,163 +1,172 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { login, logout, assertAdminAction } from "@/../lib/auth";
-import { supabase } from "@/../lib/db";
-import { uploadToR2, deleteFromR2 } from "@/../lib/r2";
-import { resourceConfigs, type FieldKind, type ResourceConfig } from "@/../lib/adminResources";
+import { getDb } from "@/db";
+import { siteConfig, educations, services, portfolios, galleries } from "@/db/schema";
+import { eq } from "drizzle-orm";
+// Assume opennextjs-cloudflare provides getCloudflareContext
+// If this import fails in Next.js dev, we will handle the fallback or instruct the user to use npm run preview
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-function getConfig(resource: string) {
-  const config = resourceConfigs[resource];
-  if (!config) throw new Error("Resource tidak dikenal");
-  return config;
+async function initDb() {
+  const { env } = await getCloudflareContext();
+  return getDb((env as any).DB);
 }
 
-function getString(formData: FormData, key: string) {
-  const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
+// ==========================================
+// SITE CONFIG (Profile & About)
+// ==========================================
+export async function getSiteConfig() {
+  const db = await initDb();
+  const result = await db.select().from(siteConfig).where(eq(siteConfig.id, "main")).limit(1);
+  return result[0] || null;
 }
 
-function parseField(formData: FormData, key: string, kind: FieldKind) {
-  if (kind === "checkbox") return formData.get(key) === "on" || formData.get(key) === "true";
-  if (kind === "number") {
-    const value = getString(formData, key);
-    return value ? Number(value) : 0;
-  }
-  if (kind === "json") {
-    const value = getString(formData, key);
-    if (!value) return [];
-    return value.split(",").map((item) => item.trim()).filter(Boolean);
-  }
-  return getString(formData, key) || null;
-}
-
-async function applyUploads(config: ResourceConfig, formData: FormData, payload: Record<string, unknown>) {
-  for (const [column, folder] of Object.entries(config.files)) {
-    const file = formData.get(column) as File | null;
-    const oldPath = getString(formData, `old_${column}`);
-    payload[column] = oldPath || null;
-
-    if (file && file.size > 0) {
-      if (oldPath) await deleteFromR2(oldPath);
-      payload[column] = await uploadToR2(file, folder);
-    }
-  }
-}
-
-export async function loginAction(password: string) {
-  return await login(password);
-}
-
-export async function logoutAction() {
-  await logout();
-  redirect("/admin/login");
-}
-
-export async function updateProfileAction(formData: FormData): Promise<void> {
-  await assertAdminAction();
-
-  const fields = [
-    "name",
-    "full_name",
-    "profession",
-    "hero_badge",
-    "bio",
-    "about_text",
-    "email",
-    "phone",
-    "whatsapp_url",
-    "location",
-    "github_url",
-    "linkedin_url",
-    "instagram_url",
-  ];
-
-  const payload: Record<string, unknown> = {};
-  for (const field of fields) payload[field] = getString(formData, field) || null;
-
-  const statsText = getString(formData, "stats_json");
-  if (statsText) {
-    try {
-      payload.stats_json = JSON.parse(statsText);
-    } catch {
-      payload.stats_json = [];
-    }
-  }
-
-  for (const [column, folder] of Object.entries({
-    avatar_path: "profiles",
-    hero_image_path: "profiles",
-    about_image_path: "profiles",
-    cv_pdf_path: "profiles",
-  })) {
-    const file = formData.get(column) as File | null;
-    const oldPath = getString(formData, `old_${column}`);
-    payload[column] = oldPath || null;
-    if (file && file.size > 0) {
-      if (oldPath) await deleteFromR2(oldPath);
-      payload[column] = await uploadToR2(file, folder);
-    }
-  }
-
-  payload.updated_at = new Date().toISOString();
-
-  const { data: existingProfile } = await supabase.from("profiles").select("id").limit(1).single();
-
-  if (existingProfile) {
-    const { error } = await supabase.from("profiles").update(payload).eq("id", existingProfile.id);
-    if (error) throw new Error(error.message);
+export async function upsertSiteConfig(data: any) {
+  const db = await initDb();
+  const existing = await getSiteConfig();
+  
+  if (existing) {
+    await db.update(siteConfig).set(data).where(eq(siteConfig.id, "main"));
   } else {
-    const { error } = await supabase.from("profiles").insert(payload);
-    if (error) throw new Error(error.message);
+    await db.insert(siteConfig).values({ id: "main", ...data });
   }
-
   revalidatePath("/");
-  revalidatePath("/admin");
+  return { success: true };
 }
 
-export async function upsertResourceAction(resource: string, formData: FormData): Promise<void> {
-  await assertAdminAction();
-  const config = getConfig(resource);
-  const id = getString(formData, "id");
-  const payload: Record<string, unknown> = {};
+// ==========================================
+// EDUCATIONS (Resume)
+// ==========================================
+export async function getEducations() {
+  const db = await initDb();
+  return db.select().from(educations).orderBy(educations.orderIndex);
+}
 
-  for (const [key, kind] of Object.entries(config.fields)) {
-    payload[key] = parseField(formData, key, kind);
-  }
-  await applyUploads(config, formData, payload);
-  payload.updated_at = new Date().toISOString();
-
-  if (id) {
-    const { error } = await supabase.from(config.table).update(payload).eq("id", id);
-    if (error) throw new Error(error.message);
-  } else {
-    const { error } = await supabase.from(config.table).insert(payload);
-    if (error) throw new Error(error.message);
-  }
-
+export async function addEducation(data: any) {
+  const db = await initDb();
+  const id = crypto.randomUUID();
+  await db.insert(educations).values({ id, ...data });
   revalidatePath("/");
-  revalidatePath(config.path);
-  revalidatePath("/admin");
+  return { success: true };
 }
 
-export async function deleteResourceAction(resource: string, id: string, filePaths: string[] = []): Promise<void> {
-  await assertAdminAction();
-  const config = getConfig(resource);
-  for (const filePath of filePaths) {
-    if (filePath) await deleteFromR2(filePath);
-  }
-  const { error } = await supabase.from(config.table).delete().eq("id", id);
-  if (error) throw new Error(error.message);
+export async function deleteEducation(id: string) {
+  const db = await initDb();
+  await db.delete(educations).where(eq(educations.id, id));
   revalidatePath("/");
-  revalidatePath(config.path);
-  revalidatePath("/admin");
+  return { success: true };
 }
 
-export async function createProjectAction(formData: FormData): Promise<void> {
-  return upsertResourceAction("projects", formData);
+export async function updateEducation(id: string, data: any) {
+  const db = await initDb();
+  await db.update(educations).set(data).where(eq(educations.id, id));
+  revalidatePath("/");
+  return { success: true };
 }
 
-export async function deleteProjectAction(id: string, imagePath?: string): Promise<void> {
-  return deleteResourceAction("projects", id, imagePath ? [imagePath] : []);
+// ==========================================
+// SERVICES
+// ==========================================
+export async function getServices() {
+  const db = await initDb();
+  return db.select().from(services).orderBy(services.orderIndex);
+}
+
+export async function addService(data: any) {
+  const db = await initDb();
+  const id = crypto.randomUUID();
+  await db.insert(services).values({ id, ...data });
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function deleteService(id: string) {
+  const db = await initDb();
+  await db.delete(services).where(eq(services.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function updateService(id: string, data: any) {
+  const db = await initDb();
+  await db.update(services).set(data).where(eq(services.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+// ==========================================
+// PORTFOLIOS
+// ==========================================
+export async function getPortfolios() {
+  const db = await initDb();
+  return db.select().from(portfolios).orderBy(portfolios.orderIndex);
+}
+
+export async function addPortfolio(data: {
+  title: string;
+  description: string;
+  mediaUrl: string;
+  projectUrl?: string;
+  isVideo: boolean;
+  techStackJson: string;
+  orderIndex: number;
+}) {
+  const db = await initDb();
+  await db.insert(portfolios).values({
+    id: crypto.randomUUID(),
+    title: data.title,
+    description: data.description,
+    mediaUrl: data.mediaUrl,
+    projectUrl: data.projectUrl,
+    isVideo: data.isVideo,
+    techStackJson: data.techStackJson,
+    orderIndex: data.orderIndex,
+  });
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function deletePortfolio(id: string) {
+  const db = await initDb();
+  await db.delete(portfolios).where(eq(portfolios.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function updatePortfolio(id: string, data: any) {
+  const db = await initDb();
+  await db.update(portfolios).set(data).where(eq(portfolios.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+// ==========================================
+// GALLERIES
+// ==========================================
+export async function getGalleries() {
+  const db = await initDb();
+  return db.select().from(galleries).orderBy(galleries.orderIndex);
+}
+
+export async function addGallery(data: any) {
+  const db = await initDb();
+  const id = crypto.randomUUID();
+  await db.insert(galleries).values({ id, ...data });
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function deleteGallery(id: string) {
+  const db = await initDb();
+  await db.delete(galleries).where(eq(galleries.id, id));
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function updateGallery(id: string, data: any) {
+  const db = await initDb();
+  await db.update(galleries).set(data).where(eq(galleries.id, id));
+  revalidatePath("/");
+  return { success: true };
 }

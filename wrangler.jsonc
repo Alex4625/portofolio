@@ -15,5 +15,13 @@
 		// Enable image optimization
 		// see https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
-	}
+	},
+	// Cloudflare D1 Database Binding
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "ituaku-db",
+			"database_id": "4ca88981-d40e-4dfa-bcca-d32dbb9827df"
+		}
+	]
 }
