@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/env";
+import { signToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -14,12 +15,13 @@ export async function POST(request: Request) {
 
     if (password === adminPassword) {
       const cookieStore = await cookies();
-      const secret = env.AUTH_SECRET || "fallback_secret";
-      cookieStore.set("admin_token", secret, {
+      const jwt = await signToken();
+      cookieStore.set("admin_token", jwt, {
         httpOnly: true,
         secure: env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
+        maxAge: 12 * 60 * 60, // 12 hours
       });
 
       return NextResponse.json({ success: true });

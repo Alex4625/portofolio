@@ -3,16 +3,17 @@ import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getR2Client } from "@/lib/r2";
 import { cookies } from "next/headers";
 import { getEnv } from "@/lib/env";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
     // 1. Authenticate request using the admin_token cookie
     const cookieStore = await cookies();
-    const token = cookieStore.get("admin_token");
+    const token = cookieStore.get("admin_token")?.value;
+    const isValidToken = await verifyToken(token);
     const env = await getEnv();
-    const authSecret = env.AUTH_SECRET || "fallback_secret";
     
-    if (!token || token.value !== authSecret) {
+    if (!isValidToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -22,6 +23,18 @@ export async function POST(request: Request) {
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    }
+
+    // 2.5 Security: File Validation
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: "File too large (Max 5MB)" }, { status: 400 });
+    }
+    
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: "Invalid file type. Only images allowed." }, { status: 400 });
     }
 
     // 3. Prepare file buffer and filename
@@ -65,11 +78,11 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("admin_token");
+    const token = cookieStore.get("admin_token")?.value;
+    const isValidToken = await verifyToken(token);
     const env = await getEnv();
-    const authSecret = env.AUTH_SECRET || "fallback_secret";
     
-    if (!token || token.value !== authSecret) {
+    if (!isValidToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
