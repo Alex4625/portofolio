@@ -1,5 +1,8 @@
+"use client";
+
 import { ExternalLink } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
+import { recordPortfolioClick } from "@/app/admin/actions";
 
 export default function PortfolioSection({ data }: { data: any[] }) {
   return (
@@ -26,6 +29,10 @@ export default function PortfolioSection({ data }: { data: any[] }) {
             <ScrollReveal key={portfolio.id} delay={0.1 * index} width="w-full">
               <div
                 className="group bg-card shadow-sm border border-border hover:shadow-lg transition-shadow duration-300 rounded-none overflow-hidden cursor-pointer h-full"
+                onClick={() => {
+                  // Only track if it doesn't have a specific projectUrl, or track anyway
+                  recordPortfolioClick(portfolio.id).catch(console.error);
+                }}
               >
                 {/* Media Container — Fixed aspect ratio, sharp corners */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
@@ -82,6 +89,12 @@ export default function PortfolioSection({ data }: { data: any[] }) {
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-primary transition-colors group-hover:underline"
+                        onClick={(e) => {
+                          // Allow the link to open naturally, but fire tracking in background
+                          recordPortfolioClick(portfolio.id).catch(console.error);
+                          // Stop propagation so the parent div onClick doesn't fire twice
+                          e.stopPropagation();
+                        }}
                       >
                         Kunjungi Proyek
                         <ExternalLink className="w-4 h-4" />

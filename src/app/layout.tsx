@@ -62,6 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import Navbar from "@/components/Navbar";
 import FooterWrapper from "@/components/FooterWrapper";
+import PageTracker from "@/components/PageTracker";
 
 export default function RootLayout({
   children,
@@ -69,8 +70,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" className="scroll-smooth">
       <body className={`${poppins.variable} ${openSans.variable}`}>
+        <PageTracker />
         <Navbar />
         {children}
         <FooterWrapper />

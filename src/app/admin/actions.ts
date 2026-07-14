@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
-import { siteConfig, educations, services, portfolios, galleries, socialLinks } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { siteConfig, educations, services, portfolios, galleries, socialLinks, analytics } from "@/db/schema";
+import { eq, asc } from "drizzle-orm";
 // Assume opennextjs-cloudflare provides getCloudflareContext
 // If this import fails in Next.js dev, we will handle the fallback or instruct the user to use npm run preview
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -209,27 +209,102 @@ export async function updateGallery(id: string, data: any) {
 // ==========================================
 export async function getSocialLinks() {
   const db = await initDb();
-  return db.select().from(socialLinks).orderBy(socialLinks.orderIndex);
+  if (!db) return [];
+  const result = await db.select().from(socialLinks).orderBy(asc(socialLinks.orderIndex));
+  return result;
 }
 
-export async function addSocialLink(data: any) {
+export async function addSocialLink(data: Omit<typeof socialLinks.$inferInsert, "id">) {
   const db = await initDb();
-  const id = crypto.randomUUID();
-  await db.insert(socialLinks).values({ id, ...data });
+  if (!db) throw new Error("Database not initialized");
+  await db.insert(socialLinks).values({ ...data, id: crypto.randomUUID() });
   revalidatePath("/");
-  return { success: true };
+  revalidatePath("/admin/profile");
+}
+
+export async function updateSocialLink(id: string, data: Partial<Omit<typeof socialLinks.$inferInsert, "id">>) {
+  const db = await initDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.update(socialLinks).set(data).where(eq(socialLinks.id, id));
+  revalidatePath("/");
+  revalidatePath("/admin/profile");
 }
 
 export async function deleteSocialLink(id: string) {
   const db = await initDb();
+  if (!db) throw new Error("Database not initialized");
   await db.delete(socialLinks).where(eq(socialLinks.id, id));
   revalidatePath("/");
-  return { success: true };
+  revalidatePath("/admin/profile");
 }
 
-export async function updateSocialLink(id: string, data: any) {
+// ANALYTICS ACTIONS
+export async function recordPageView() {
+  try {
+    const db = await initDb();
+    if (!db) return;
+    
+    // We'll track total page views under the ID 'page_views_total'
+    const viewId = "page_views_total";
+    const existing = await db.select().from(analytics).where(eq(analytics.id, viewId));
+    
+    if (existing && existing.length > 0) {
+      await db.update(analytics)
+        .set({ count: existing[0].count + 1 })
+        .where(eq(analytics.id, viewId));
+    } else {
+      await db.insert(analytics).values({
+        id: viewId,
+        type: "page_view",
+        count: 1
+      });
+    }
+  } catch (error) {
+    console.error("Failed to record page view", error);
+  }
+}
+
+export async function recordPortfolioClick(portfolioId: string) {
+  try {
+    const db = await initDb();
+    if (!db) return;
+    
+    const clickId = `portfolio_click_${portfolioId}`;
+    const existing = await db.select().from(analytics).where(eq(analytics.id, clickId));
+    
+    if (existing && existing.length > 0) {
+      await db.update(analytics)
+        .set({ count: existing[0].count + 1 })
+        .where(eq(analytics.id, clickId));
+    } else {
+      await db.insert(analytics).values({
+        id: clickId,
+        type: "portfolio_click",
+        targetId: portfolioId,
+        count: 1
+      });
+    }
+  } catch (error) {
+    console.error("Failed to record portfolio click", error);
+  }
+}
+
+export async function getAnalyticsData() {
   const db = await initDb();
-  await db.update(socialLinks).set(data).where(eq(socialLinks.id, id));
-  revalidatePath("/");
-  return { success: true };
+  if (!db) return { pageViews: 0, portfolioClicks: [] };
+  
+  const allAnalytics = await db.select().from(analytics);
+  
+  const pageViewsRecord = allAnalytics.find(a => a.id === "page_views_total");
+  const pageViews = pageViewsRecord ? pageViewsRecord.count : 0;
+  
+  const portfolioClicks = allAnalytics
+    .filter(a => a.type === "portfolio_click" && a.targetId)
+    .map(a => ({ portfolioId: a.targetId!, count: a.count }))
+    .sort((a, b) => b.count - a.count); // sort descending by count
+    
+  return {
+    pageViews,
+    portfolioClicks
+  };
 }

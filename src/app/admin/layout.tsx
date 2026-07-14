@@ -13,6 +13,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   const navItems = [
+    { name: "Dasbor (Analitik)", path: "/admin" },
     { name: "Profil (Hero/About)", path: "/admin/profile" },
     { name: "Edukasi (Resume)", path: "/admin/education" },
     { name: "Layanan (Services)", path: "/admin/services" },

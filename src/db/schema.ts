@@ -61,3 +61,10 @@ export const socialLinks = sqliteTable("social_links", {
   iconName: text("icon_name").notNull(), // 'instagram', 'youtube', 'linkedin'
   orderIndex: integer("order_index").notNull().default(0),
 });
+
+export const analytics = sqliteTable("analytics", {
+  id: text("id").primaryKey(), // e.g., 'page_views_total' or 'portfolio_click_<id>'
+  type: text("type").notNull(), // 'page_view' or 'portfolio_click'
+  targetId: text("target_id"), // if type is 'portfolio_click', this holds the portfolio id
+  count: integer("count").notNull().default(0),
+});
